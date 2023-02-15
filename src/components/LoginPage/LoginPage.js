@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from 'axios';
 import "./LoginPage.css";
 import { Link } from "react-router-dom";
 
@@ -9,8 +10,15 @@ const LoginPage = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
     // Make API call or perform other action with the entered credentials
-    console.log("Email:", email);
-    console.log("Password:", password);
+    axios.post("http://localhost:4000/", { email, password })
+      .then(response => {
+        console.log("Logged in successfully");
+        // Navigate to apps homepage
+      })
+      .catch(error => {
+        console.error(error);
+        // Show an error message to the user
+      });
   };
 
   return (
@@ -18,19 +26,19 @@ const LoginPage = () => {
       <form className="login-form" onSubmit={handleSubmit}>
         <h1 className="login-title">Login</h1>
         <div className="login-input-group">
+          {/* Email Input Field */}
           <label htmlFor="email" id="CenterText">Email</label>
           <input
-            type="text"
-            id="email"
+            type="email"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
           />
         </div>
         <div className="login-input-group">
+          {/* Password Input Field */}
           <label htmlFor="password" id="CenterText">Password</label>
           <input
             type="password"
-            id="password"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
           />
@@ -46,6 +54,7 @@ const LoginPage = () => {
         <button type="submit" className="login-submit-button">
           Login
         </button>
+
       </form>
     </div>
   );
