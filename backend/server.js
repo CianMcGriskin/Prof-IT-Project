@@ -29,43 +29,42 @@ app.use(function (req, res, next) {
 // Create a new MongoClient instance
 const client = new MongoClient(uri, { useNewUrlParser: true });
 
+client.connect(err => {
+  if (err) {
+    console.error(err);
+    return;
+  }
+  console.log("Successfully Connected to MongoDB Atlas")
+});
+
 app.post("/", (req, res) => {
-    const email = req.body.email;
-    const password = req.body.password;
+  console.log("Post req sent to /")
+  const email = req.body.email;
+  const password = req.body.password;
+  console.log(`Email: ${email} Password: ${password}`)
   
-    client.connect(function(err) {
-      if (err) {
-        console.error(err);
-        res.sendStatus(500);
-        return;
-      }
-  
-      const db = client.db(dbName);
-      const collection = db.collection("Users");
-  
-      // Find the user with the specified email and password
-      collection.findOne({ email: email, password: password }, function(err, user) {
-        if (err) {
-          console.error(err);
-          res.sendStatus(500);
-          console.log("Error")
-          return;
-        }
-  
-        if (user) {
-          // User found, continue with login process
-          res.sendStatus(200);
-          console.log("Success")
-        } else {
-          // User not found, send error message
-          res.status(401).send("Invalid email or password");
-          console.log("Error - not found")
-        }
-      });
-    });
+  const collection = client.db('Rosterota').collection('Users');
+  // Find the user with the specified email and password
+  collection.findOne(
+    { email: email, password: password },
+    (error, user) => {
+    console.log("Entered Findone");
+    if (error) {
+      console.error(err);
+      console.log("Error")
+      return;
+    } 
+    if (user) {
+      // User found, continue with login process
+      console.log("Success")
+    } else {
+      // User not found, send error message
+      console.log("Error - not found")
+    }
   });
+});
 
 // Start the server
 app.listen(port, () => {
-    console.log("Server listening on specified port");
+    console.log(`Server listening on specified port: ${port}`);
   });
