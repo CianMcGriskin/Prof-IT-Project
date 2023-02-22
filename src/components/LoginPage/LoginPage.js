@@ -9,13 +9,14 @@ const LoginPage = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    // Make API call or perform other action with the entered credentials
-    axios.post("http://localhost:4000/", { email, password })
-      .then(response => {
-        console.log("Logged in successfully");
+    // Make API call to login endpoint with email and password credentials
+    axios
+      .post("http://localhost:4000/", { email, password })
+      .then((response) => {
+        console.log(response.data);
         // Navigate to apps homepage
       })
-      .catch(error => {
+      .catch((error) => {
         console.error(error);
         // Show an error message to the user
       });

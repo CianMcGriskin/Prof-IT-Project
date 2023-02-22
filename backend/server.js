@@ -1,70 +1,54 @@
-// Import the required modules
-const express = require('express');
+const express = require("express");
 const bodyParser = require("body-parser");
-const cors = require('cors');
+const cors = require("cors");
+const mongoose = require("mongoose");
 
+const app = express();
 
-// Import the MongoClient class from the mongodb library
-const MongoClient = require('mongodb').MongoClient;
-
-// Initialize the Express app and set the port
-const app = express()
-const port = 4000;
-const dbName = "Rosterota";
-
-// Connection URI for the MongoDB Atlas cluster
-const uri = "mongodb+srv://batman:root@cluster0.tjfhrts.mongodb.net/?retryWrites=true&w=majority";
-
-app.use(bodyParser.urlencoded({ extended: true }));
+// Set up body-parser and cors middleware
 app.use(bodyParser.json());
 app.use(cors());
-app.use(function (req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.header("Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept");
-  next();
+
+// Connect to MongoDB database
+mongoose.connect("mongodb+srv://batman:root@cluster0.tjfhrts.mongodb.net/Rosterota?retryWrites=true&w=majority", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
 });
 
-// Create a new MongoClient instance
-const client = new MongoClient(uri, { useNewUrlParser: true });
+const userSchema = new mongoose.Schema({
+  email: String,
+  password: String,
+}, { collection: "Users" });
 
-client.connect(err => {
-  if (err) {
-    console.error(err);
-    return;
-  }
-  console.log("Successfully Connected to MongoDB Atlas")
-});
+const User = mongoose.model("User", userSchema);
 
+
+// Set up a login API endpoint
 app.post("/", (req, res) => {
-  console.log("Post req sent to /")
-  const email = req.body.email;
-  const password = req.body.password;
-  console.log(`Email: ${email} Password: ${password}`)
-  
-  const collection = client.db('Rosterota').collection('Users');
-  // Find the user with the specified email and password
-  collection.findOne(
-    { email: email, password: password },
-    (error, user) => {
-    console.log("Entered Findone");
-    if (error) {
+  const { email, password } = req.body;
+
+  // Check if email exists in the database
+  User.findOne({ email }, (err, user) => {
+    if (err) {
       console.error(err);
-      console.log("Error")
-      return;
-    } 
-    if (user) {
-      // User found, continue with login process
-      console.log("Success")
+      res.status(500).send("Server error");
+    } else if (!user) {
+      res.status(400).send("Email not found");
+      console.log("Email not found")
     } else {
-      // User not found, send error message
-      console.log("Error - not found")
+      // Check if password matches
+      if (user.password === password) {
+        res.status(200).send("Logged in successfully");
+      console.log("Correct password")
+      } else {
+        res.status(400).send("Incorrect password");
+      console.log("Wrong password")
+      }
     }
   });
 });
 
 // Start the server
-app.listen(port, () => {
-    console.log(`Server listening on specified port: ${port}`);
-  });
+app.listen(4000, () => {
+  console.log("Server listening on port 4000");
+});
