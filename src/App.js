@@ -4,6 +4,7 @@ import LoginPage from './components/LoginPage/LoginPage'
 import RegisterPage from './components/RegisterPage/RegisterPage';
 import logo from './logo.svg';
 import './App.css';
+import TimetablePage from './components/Timetable/Timetable';
 
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
   <Routes>
     <Route path="/" element={<LoginPage></LoginPage>} />
     <Route path="/register" element={<RegisterPage></RegisterPage>} />
+    <Route path="/timetable" element={<TimetablePage></TimetablePage>} />
   </Routes>
   
   </BrowserRouter>

@@ -2,7 +2,6 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const mongoose = require("mongoose");
-
 const app = express();
 
 // Set up body-parser and cors middleware
@@ -49,6 +48,7 @@ app.post("/", (req, res) => {
 });
 
 // Start the server
-app.listen(4000, () => {
-  console.log("Server listening on port 4000");
+let port = 4000;
+app.listen(port, () => {
+  console.log(`Server listening on port ${port}`);
 });
