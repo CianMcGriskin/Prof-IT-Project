@@ -4,14 +4,14 @@ import axios from 'axios';
 
 
 const TimetablePage = () => {
-  axios.get('/timetable')
+  axios.get('http://localhost:4000/timetable')
   .then(response => {
     console.log(response.data);
   })
   .catch(error => {
     console.error(error);
   });
-  
+
     return (
         <div>
         <NavigationBar/>

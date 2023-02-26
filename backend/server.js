@@ -17,31 +17,51 @@ mongoose.connect("mongodb+srv://batman:root@cluster0.tjfhrts.mongodb.net/Rostero
   useUnifiedTopology: true,
 });
 
+// Schemas of the backend
 const userSchema = new mongoose.Schema({
   email: String,
   password: String,
 }, { collection: "Users" });
 
-const User = mongoose.model("User", userSchema);
+const hoursSchema = new mongoose.Schema({
+  userID: String,
+  weekID: String,
+  schedule: Array
+});
 
-// Used to see if user is logged in
-const requireLogin = (req, res, next) => {
-  const { userCookieAuth } = req.cookies;
-  if (!userCookieAuth) {
-    return res.redirect('/');
-  }
-  next();
-};
+const Users = mongoose.model("User", userSchema);
+const Hours = mongoose.model('Hours', hoursSchema);
 
-app.get('/timetable', requireLogin, (req, res) => {
-  res.send('This is your timetable');
+app.get('/timetable', (req, res) => {
+  let userID = "1";
+  let weekID = "1";
+
+  // Find the 'hours' document for the specified user ID
+  Hours.findOne({ userID: userID, weekID: weekID}, (err, hours) => {
+    if (err) 
+      console.log("Error");
+    
+    if (!hours) 
+      console.log("Finding UserID & WeekID returned null");
+
+    console.log(hours);
+
+    // Find the schedule data for the specified week ID
+    const schedule = hours.schedule;
+    if (!schedule) 
+      console.log("scheudle not found");
+    
+    console.log(schedule);
+    // Return the schedule data for the specified week ID
+    return res.json(schedule);
+  });
 });
 
 // Set up a login API endpoint
 app.post("/", (req, res) => {
   const { email, password } = req.body;
   // Check if email exists in the database
-  User.findOne({ email }, (err, user) => {
+  Users.findOne({ email }, (err, user) => {
     if (err) {
       console.error(err);
       res.status(500).send("Server error");
