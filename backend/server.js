@@ -74,6 +74,7 @@ app.get("/timetable", async (req, res) => {
     const hours = await Hours.find();
     // Return data as JSON response
     res.json(hours);
+    console.log(hours)
   } catch (err) {
     // Handle error
     console.error(err);
@@ -86,6 +87,8 @@ app.get("/timetable/:weekId", async (req, res) => {
     const weekId = req.params.weekId;
     // Fetch data from "Hours" collection for the specified week
     const timetable = await Hours.findOne({ weekID: weekId });
+    // Set the response header to "application/json"
+    res.setHeader("Content-Type", "application/json");
     // Return data as JSON response
     res.json(timetable);
   } catch (err) {
@@ -94,6 +97,7 @@ app.get("/timetable/:weekId", async (req, res) => {
     res.status(500).send("Server error");
   }
 });
+
 
 
 

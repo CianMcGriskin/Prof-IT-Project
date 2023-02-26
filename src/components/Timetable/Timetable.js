@@ -1,65 +1,65 @@
 import NavigationBar from '../Navbar/Navbar'
 import axios from 'axios';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const TimetablePage = () => {
-  const [selectedWeek, setSelectedWeek] = useState("1"); // default to week 1
-  const [timetable, setTimetable] = useState(null);
+  const [selectedWeek, setSelectedWeek] = useState("");
+  const [hoursData, setHoursData] = useState([]);
 
-  const handleWeekChange = (event) => {
-    setSelectedWeek(event.target.value);
-    axios.get(`http://localhost:4000/timetable/${event.target.value}`)
+  useEffect(() => {
+    if (selectedWeek !== "") {
+      axios.get(`http://localhost:4000/timetable?weekID=${selectedWeek}`)
       .then(response => {
-        setTimetable(response.data);
+        const filteredData = response.data.filter(hour => hour.weekID === selectedWeek);
+        setHoursData(filteredData);
       })
       .catch(error => {
         console.error(error);
       });
+    }
+  }, [selectedWeek]);
+
+  const handleWeekChange = (event) => {
+    setSelectedWeek(event.target.value);
   }
 
   return (
     <div>
       <NavigationBar/>
       <div>
-        <label htmlFor="week-select">Select week:</label>
+        <label htmlFor="week-select">Select Week:</label>
         <select id="week-select" value={selectedWeek} onChange={handleWeekChange}>
+          <option value="">--Select a week--</option>
           <option value="1">Week 1</option>
           <option value="2">Week 2</option>
           <option value="3">Week 3</option>
-          {/* Add more options for additional weeks */}
+          {/* Add more options as needed */}
         </select>
       </div>
-      {timetable ? (
-        <div>
-          {/* Log the timetable data */}
-          {console.log(timetable)}
-          <table>
-            <thead>
-              <tr>
-                <th>Day</th>
-                <th>Start time</th>
-                <th>End time</th>
-                <th>Hours</th>
+      {hoursData.length > 0 &&
+        <table>
+          <thead>
+            <tr>
+              <th>Day</th>
+              <th>Start Time</th>
+              <th>End Time</th>
+              <th>Hours Worked</th>
+            </tr>
+          </thead>
+          <tbody>
+            {hoursData.map((hour) => (
+              <tr key={hour._id}>
+                <td>{hour.schedule[0]}</td>
+                <td>{new Date(hour.schedule[1]).toLocaleTimeString()}</td>
+                <td>{new Date(hour.schedule[2]).toLocaleTimeString()}</td>
+                <td>{hour.schedule[3]}</td>
               </tr>
-            </thead>
-            <tbody>
-              {timetable.schedule.map((entry, index) => (
-                <tr key={index}>
-                  <td>{entry[0]}</td>
-                  <td>{entry[1]}</td>
-                  <td>{entry[2]}</td>
-                  <td>{entry[3]}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      ) : (
-        <p>Select a week to view timetable</p>
-      )}
+            ))}
+          </tbody>
+        </table>
+      }
     </div>
   );
-  
 };
 
 export default TimetablePage;
