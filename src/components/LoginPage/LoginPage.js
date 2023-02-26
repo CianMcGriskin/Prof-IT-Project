@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import axios from 'axios';
 import "./LoginPage.css";
+import { useCookies } from 'react-cookie';
 import { Link } from "react-router-dom";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [cookies, setCookie] = useCookies(['user']);
+  
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -14,10 +17,19 @@ const LoginPage = () => {
       .post("http://localhost:4000/", { email, password })
       .then((response) => {
         console.log(response.data);
+        if(response.data === "success"){
+          // Set expiry date for the cookie
+          var expiryDate = new Date();
+          expiryDate.setTime(expiryDate.getTime() + (7 * 24 * 60 * 60 * 1000)); // 7 days in milliseconds
+
+          // Set the cookie with the expiry date
+          document.cookie = "Auth=" + email +"; expires=" + expiryDate.toUTCString() + "; path=/";
+        }
         // Navigate to apps homepage
+        window.location.href = "/timetable";
       })
       .catch((error) => {
-        console.error(error);
+        console.error(error.data);
         // Show an error message to the user
       });
   };
