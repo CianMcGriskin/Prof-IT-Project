@@ -34,15 +34,6 @@ const Register = () => {
       console.log("User registered successfully:", response.data);
   
       // Make another API call to update UserInfo collection
-      const userInfoResponse = await axios.post("http://localhost:4000/updateUserInfo", {
-        firstName,
-        surname,
-        email,
-        companyID,
-      });
-      console.log("UserInfo updated successfully:", userInfoResponse.data);
-  
-      alert("User registered successfully!");
     } catch (error) {
       console.error("Error registering user:", error);
       alert("Error registering user. Please try again.");

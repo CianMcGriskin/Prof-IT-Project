@@ -2,14 +2,12 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const mongoose = require("mongoose");
-const uuid = require("uuid");
 const app = express();
-const cookieParser = require("cookie-parser");
 
 // Set up body-parser and cors middleware
 app.use(bodyParser.json());
 app.use(cors());
-app.use(cookieParser());
+
 
 // Connect to MongoDB database
 mongoose.connect(
@@ -24,8 +22,10 @@ const userSchema = new mongoose.Schema(
   {
     email: String,
     password: String,
+    userID: Number,
+    status: { type: String, default: "Pending" },
   },
-  { collection: "Users" }
+  { collection: "Users" , versionKey: false}
 );
 
 // Define Mongoose schema
@@ -34,15 +34,15 @@ const hoursSchema = new mongoose.Schema({
   userID: Number,
   weekID: Number,
 },
-{ collection: "Hours" });
+{ collection: "Hours" , versionKey: false});
 
 const registerRequestSchema = new mongoose.Schema(
   {
     UserID: Number,
-    status: { type: String, default: "Denied" },
+    status: { type: String, default: "Pending" },
     hourlyRate: Number,
   },
-  { collection: "RegisterRequests" }
+  { collection: "RegisterRequests", versionKey: false }
 );
 
 const userInfoSchema = new mongoose.Schema({
@@ -52,7 +52,7 @@ const userInfoSchema = new mongoose.Schema({
   userType: String,
   companyID: Number,
   userID: Number,
-}, { collection: "UserInfo" });
+}, { collection: "UserInfo" , versionKey: false});
 
 
 const Users = mongoose.model("User", userSchema);
@@ -121,6 +121,15 @@ app.get("/timetable/:weekId", async (req, res) => {
 
 // Set up a registration API endpoint
 app.post("/register", async (req, res) => {
+  const {
+    firstName,
+    surname,
+    email,
+    password,
+    phoneNumber,
+    companyID,
+  } = req.body;
+
   try {
     const { hourlyRate } = req.body;
     // Find the latest user ID in the RegisterRequests collection
@@ -131,14 +140,32 @@ app.post("/register", async (req, res) => {
     );
     // Generate a new user ID by incrementing the latest ID by 1
     const UserID = latestRequest ? latestRequest.UserID + 1 : 1;
-    // Create a new register request with default status "Denied"
+    // Create a new register request with default status "Pending"
     const newRequest = new RegisterRequests({
       UserID,
-      status: "Denied",
+      status: "Pending",
       hourlyRate: hourlyRate || 12.11,
     });
+    const userInfo = new UserInfo({
+      firstName,
+      lastName: surname,
+      phoneNumber,
+      userType: "employee",
+      companyID,
+      userID: UserID,
+    });
+
+    const users = new Users({
+      status: "Pending",
+      email,
+      password,
+      userID: UserID,
+    })
     // Save the new request to the database
+    await userInfo.save();
     await newRequest.save();
+    await users.save();
+
     res.status(200).send("success");
     console.log(`New register request saved: ${JSON.stringify(newRequest)}`);
   } catch (err) {
