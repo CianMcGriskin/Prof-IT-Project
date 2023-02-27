@@ -1,14 +1,19 @@
 import React, { useState } from "react";
 import axios from 'axios';
 import "./LoginPage.css";
-import { useCookies } from 'react-cookie';
 import { Link } from "react-router-dom";
+import { Redirect } from 'react-router-dom';
+import Cookies from 'js-cookie';
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [cookies, setCookie] = useCookies(['user']);
   
+  // Check for the Auth cookie
+  const hasAuthCookie = Cookies.get('Auth');
+  if (hasAuthCookie) {
+    window.location.href = "/timetable";
+  }
 
   const handleSubmit = (event) => {
     event.preventDefault();
