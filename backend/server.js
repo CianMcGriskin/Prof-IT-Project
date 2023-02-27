@@ -13,8 +13,7 @@ app.use(cookieParser());
 
 // Connect to MongoDB database
 mongoose.connect(
-  "mongodb+srv://batman:root@cluster0.tjfhrts.mongodb.net/Rosterota?retryWrites=true&w=majority",
-  {
+  "mongodb+srv://batman:root@cluster0.tjfhrts.mongodb.net/Rosterota?retryWrites=true&w=majority",{
     useNewUrlParser: true,
     useUnifiedTopology: true,
   }
@@ -32,8 +31,8 @@ const userSchema = new mongoose.Schema(
 // Define Mongoose schema
 const hoursSchema = new mongoose.Schema({
   schedule: [mongoose.Schema.Types.Mixed],
-  userID: String,
-  weekID: String,
+  userID: Number,
+  weekID: Number,
 },
 { collection: "Hours" });
 
@@ -148,9 +147,6 @@ app.post("/register", async (req, res) => {
     res.status(500).send("Server error");
   }
 });
-
-
-
 
 // Start the server
 let port = 4000;

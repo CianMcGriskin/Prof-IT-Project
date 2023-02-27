@@ -1,10 +1,16 @@
 import NavigationBar from '../Navbar/Navbar'
 import axios from 'axios';
 import { useState, useEffect } from 'react';
+import Cookies from 'js-cookie';
+
 
 const TimetablePage = () => {
   const [selectedWeek, setSelectedWeek] = useState("");
   const [hoursData, setHoursData] = useState([]);
+
+  const hasAuthCookie = Cookies.get('Auth');
+  if (!hasAuthCookie) 
+    window.location.href = "/";
 
   useEffect(() => {
     if (selectedWeek !== "") {

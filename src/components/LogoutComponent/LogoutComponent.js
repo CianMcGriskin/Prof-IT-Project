@@ -5,7 +5,6 @@ function LogoutComponent() {
     function handleLogout() {
      // Delete the Auth cookie
      Cookies.remove('Auth');
-
      // Redirect the user to the / page
      window.location.href = "/";
     }

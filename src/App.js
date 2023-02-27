@@ -14,7 +14,6 @@ function App() {
       <Route path="/register" element={<RegisterPage></RegisterPage>} />
       <Route path="/timetable" element={<TimetablePage></TimetablePage>} />
     </Routes>
-    
   </BrowserRouter>
   );
 }

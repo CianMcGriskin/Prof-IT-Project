@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import axios from 'axios';
 import "./LoginPage.css";
 import { Link } from "react-router-dom";
-import { Redirect } from 'react-router-dom';
 import Cookies from 'js-cookie';
 
 const LoginPage = () => {
@@ -11,17 +10,15 @@ const LoginPage = () => {
   
   // Check for the Auth cookie
   const hasAuthCookie = Cookies.get('Auth');
-  if (hasAuthCookie) {
+  if (hasAuthCookie) 
     window.location.href = "/timetable";
-  }
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    // Make API call to login endpoint with email and password credentials
+    // Make get to login expressJS with email and password credentials
     axios
       .post("http://localhost:4000/", { email, password })
       .then((response) => {
-        console.log(response.data);
         if(response.data === "success"){
           // Set expiry date for the cookie
           var expiryDate = new Date();
@@ -34,8 +31,7 @@ const LoginPage = () => {
         window.location.href = "/timetable";
       })
       .catch((error) => {
-        console.error(error.data);
-        // Show an error message to the user
+        console.error(error.data); // Show an error message to the user
       });
   };
 
@@ -61,7 +57,6 @@ const LoginPage = () => {
             onChange={(event) => setPassword(event.target.value)}
           />
         </div>
-
         <div>
             Don't have an account?{" "}
             <Link to="/register">

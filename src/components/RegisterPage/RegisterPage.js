@@ -9,6 +9,7 @@ const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [companyID, setCompanyID] = useState("");
 
   const handleSubmit = async (event) => {
@@ -27,6 +28,7 @@ const Register = () => {
         surname,
         email,
         password,
+        phoneNumber,
         companyID,
       });
       console.log("User registered successfully:", response.data);
@@ -99,6 +101,16 @@ const Register = () => {
             id="confirmPassword"
             value={confirmPassword}
             onChange={(event) => setConfirmPassword(event.target.value)}
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="phoneNumber">Phone Number (Optional)</label>
+          <input
+            type="text"
+            id="phoneNumber"
+            value={phoneNumber}
+            onChange={(event) => setPhoneNumber(event.target.value)}
           />
         </div>
 
