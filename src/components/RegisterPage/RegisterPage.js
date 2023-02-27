@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import "./RegisterPage.css";
+import axios from "axios";
 
 const Register = () => {
   const [firstName, setFirstName] = useState("");
@@ -10,7 +11,7 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [companyID, setCompanyID] = useState("");
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     // Validate the entered information
@@ -19,85 +20,97 @@ const Register = () => {
       return;
     }
 
-    // Make API call or perform other action with the entered information
-    console.log("Name:", firstName + surname);
-    console.log("Email:", email);
-    console.log("Password:", password);
+    // Make API call to send the entered information to the database
+    try {
+      const response = await axios.post("http://localhost:4000/register", {
+        firstName,
+        surname,
+        email,
+        password,
+        companyID,
+      });
+      console.log("User registered successfully:", response.data);
+      alert("User registered successfully!");
+    } catch (error) {
+      console.error("Error registering user:", error);
+      alert("Error registering user. Please try again.");
+    }
   };
 
   return (
     <div className="register-container">
-    <form className="register-form" id="CenterText" onSubmit={handleSubmit}>
-
-      <h2>Sign Up</h2>
-      <div className="form-group">
-        <label htmlFor="firstName" >First Name</label>
-        <input
-          type="text"
-          id="firstName"
-          value={firstName}
-          onChange={(event) => setFirstName(event.target.value)}
-        />
-      </div>
-
-      <div className="form-group">
-        <label htmlFor="surname">Surname</label>
-        <input
-          type="text"
-          id="surname"
-          value={surname}
-          onChange={(event) => setSurname(event.target.value)}
-        />
-      </div>
-
-      <div className="form-group">
-        <label htmlFor="email">Email</label>
-        <input
-          type="email"
-          id="email"
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
-        />
-      </div>
-
-      <div className="form-group">
-        <label htmlFor="password">Password</label>
-        <input
-          type="password"
-          id="password"
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
-        />
-      </div>
-
-      <div className="form-group">
-        <label htmlFor="confirmPassword">Confirm Password</label>
-        <input
-          type="password"
-          id="confirmPassword"
-          value={confirmPassword}
-          onChange={(event) => setConfirmPassword(event.target.value)}
-        />
-     </div>
-
-      <div className="form-group">
-        <label htmlFor="companyID">Company ID</label>
-        <input
-          type="text"
-          id="companyID"
-          value={companyID}
-          onChange={(event) => setCompanyID(event.target.value)}
-        />
-        Please note that only employees can register, manager accounts are made seperatley
+      <form className="register-form" id="CenterText" onSubmit={handleSubmit}>
+        <h2>Sign Up</h2>
+        <div className="form-group">
+          <label htmlFor="firstName">First Name</label>
+          <input
+            type="text"
+            id="firstName"
+            value={firstName}
+            onChange={(event) => setFirstName(event.target.value)}
+          />
         </div>
-      <div>
-            Back to {" "}
-            <Link to="/">
-                <span style={{ color: "blue", cursor: "pointer" }}>login.</span>
-            </Link>
+
+        <div className="form-group">
+          <label htmlFor="surname">Surname</label>
+          <input
+            type="text"
+            id="surname"
+            value={surname}
+            onChange={(event) => setSurname(event.target.value)}
+          />
         </div>
-      <button type="submit">Sign Up</button>
-    </form>
+
+        <div className="form-group">
+          <label htmlFor="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="confirmPassword">Confirm Password</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            value={confirmPassword}
+            onChange={(event) => setConfirmPassword(event.target.value)}
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="companyID">Company ID</label>
+          <input
+            type="text"
+            id="companyID"
+            value={companyID}
+            onChange={(event) => setCompanyID(event.target.value)}
+          />
+          Please note that only employees can register, manager accounts are made seperatley
+        </div>
+
+        <div>
+          Back to{" "}
+          <Link to="/">
+            <span style={{ color: "blue", cursor: "pointer" }}>login.</span>
+          </Link>
+        </div>
+
+        <button type="submit">Sign Up</button>
+      </form>
     </div>
   );
 };

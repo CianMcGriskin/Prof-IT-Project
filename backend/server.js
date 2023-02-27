@@ -37,8 +37,18 @@ const hoursSchema = new mongoose.Schema({
 },
 { collection: "Hours" });
 
+const registerRequestSchema = new mongoose.Schema(
+  {
+    UserID: Number,
+    status: { type: String, default: "Denied" },
+    hourlyRate: Number,
+  },
+  { collection: "RegisterRequests" }
+);
+
 const Users = mongoose.model("User", userSchema);
 const Hours = mongoose.model("Hours", hoursSchema);
+const RegisterRequests = mongoose.model("RegisterRequests", registerRequestSchema);
 
 // Set up a login API endpoint
 app.post("/", (req, res) => {
@@ -91,6 +101,35 @@ app.get("/timetable/:weekId", async (req, res) => {
     res.setHeader("Content-Type", "application/json");
     // Return data as JSON response
     res.json(timetable);
+  } catch (err) {
+    // Handle error
+    console.error(err);
+    res.status(500).send("Server error");
+  }
+});
+
+// Set up a registration API endpoint
+app.post("/register", async (req, res) => {
+  try {
+    const { hourlyRate } = req.body;
+    // Find the latest user ID in the RegisterRequests collection
+    const latestRequest = await RegisterRequests.findOne(
+      {},
+      {},
+      { sort: { UserID: -1 } }
+    );
+    // Generate a new user ID by incrementing the latest ID by 1
+    const UserID = latestRequest ? latestRequest.UserID + 1 : 1;
+    // Create a new register request with default status "Denied"
+    const newRequest = new RegisterRequests({
+      UserID,
+      status: "Denied",
+      hourlyRate: hourlyRate || 12.11,
+    });
+    // Save the new request to the database
+    await newRequest.save();
+    res.status(200).send("success");
+    console.log(`New register request saved: ${JSON.stringify(newRequest)}`);
   } catch (err) {
     // Handle error
     console.error(err);
