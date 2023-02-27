@@ -13,13 +13,13 @@ const Register = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
+  
     // Validate the entered information
     if (password !== confirmPassword) {
       alert("Passwords do not match");
       return;
     }
-
+  
     // Make API call to send the entered information to the database
     try {
       const response = await axios.post("http://localhost:4000/register", {
@@ -30,12 +30,23 @@ const Register = () => {
         companyID,
       });
       console.log("User registered successfully:", response.data);
+  
+      // Make another API call to update UserInfo collection
+      const userInfoResponse = await axios.post("http://localhost:4000/updateUserInfo", {
+        firstName,
+        surname,
+        email,
+        companyID,
+      });
+      console.log("UserInfo updated successfully:", userInfoResponse.data);
+  
       alert("User registered successfully!");
     } catch (error) {
       console.error("Error registering user:", error);
       alert("Error registering user. Please try again.");
     }
   };
+  
 
   return (
     <div className="register-container">

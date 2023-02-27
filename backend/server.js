@@ -46,9 +46,21 @@ const registerRequestSchema = new mongoose.Schema(
   { collection: "RegisterRequests" }
 );
 
+const userInfoSchema = new mongoose.Schema({
+  firstName: String,
+  lastName: String,
+  phoneNumber: String,
+  userType: String,
+  companyID: Number,
+  userID: Number,
+}, { collection: "UserInfo" });
+
+
 const Users = mongoose.model("User", userSchema);
 const Hours = mongoose.model("Hours", hoursSchema);
 const RegisterRequests = mongoose.model("RegisterRequests", registerRequestSchema);
+const UserInfo = mongoose.model("UserInfo", userInfoSchema);
+
 
 // Set up a login API endpoint
 app.post("/", (req, res) => {
