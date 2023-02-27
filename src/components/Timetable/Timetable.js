@@ -3,31 +3,30 @@ import axios from 'axios';
 import { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
 
-
 const TimetablePage = () => {
   const [selectedWeek, setSelectedWeek] = useState("");
   const [hoursData, setHoursData] = useState([]);
 
   const hasAuthCookie = Cookies.get('Auth');
-  if (!hasAuthCookie) 
+  if (!hasAuthCookie) {
     window.location.href = "/";
+  }
 
   useEffect(() => {
-    if (selectedWeek !== "") {
-      axios.get(`http://localhost:4000/timetable?weekID=${selectedWeek}`)
+    axios.get(`http://localhost:4000/timetable`)
       .then(response => {
-        const filteredData = response.data.filter(hour => hour.weekID === selectedWeek);
-        setHoursData(filteredData);
+        setHoursData(response.data);
       })
       .catch(error => {
         console.error(error);
       });
-    }
-  }, [selectedWeek]);
+  }, []);
 
   const handleWeekChange = (event) => {
     setSelectedWeek(event.target.value);
   }
+
+  const filteredData = selectedWeek !== "" ? hoursData.filter(hours => hours.weekID === selectedWeek) : [];
 
   return (
     <div>
@@ -42,10 +41,11 @@ const TimetablePage = () => {
           {/* Add more options as needed */}
         </select>
       </div>
-      {hoursData.length > 0 &&
+      {filteredData.length > 0 && (
         <table>
           <thead>
             <tr>
+              <th>Week</th>
               <th>Day</th>
               <th>Start Time</th>
               <th>End Time</th>
@@ -53,8 +53,9 @@ const TimetablePage = () => {
             </tr>
           </thead>
           <tbody>
-            {hoursData.map((hour) => (
+            {filteredData.map((hour) => (
               <tr key={hour._id}>
+                <td>{hour.weekID}</td>
                 <td>{hour.schedule[0]}</td>
                 <td>{new Date(hour.schedule[1]).toLocaleTimeString()}</td>
                 <td>{new Date(hour.schedule[2]).toLocaleTimeString()}</td>
@@ -63,7 +64,7 @@ const TimetablePage = () => {
             ))}
           </tbody>
         </table>
-      }
+      )}
     </div>
   );
 };

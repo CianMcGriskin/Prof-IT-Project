@@ -32,7 +32,7 @@ const userSchema = new mongoose.Schema(
 const hoursSchema = new mongoose.Schema({
   schedule: [mongoose.Schema.Types.Mixed],
   userID: Number,
-  weekID: Number,
+  weekID: String,
 },
 { collection: "Hours" , versionKey: false});
 
@@ -107,17 +107,25 @@ app.get("/timetable/:weekId", async (req, res) => {
   try {
     const weekId = req.params.weekId;
     // Fetch data from "Hours" collection for the specified week
+    console.log(weekId)
     const timetable = await Hours.findOne({ weekID: weekId });
-    // Set the response header to "application/json"
-    res.setHeader("Content-Type", "application/json");
-    // Return data as JSON response
-    res.json(timetable);
+    if (!timetable) {
+      // Return 404 status code if timetable for the specified week is not found
+      res.status(404).send("Timetable not found for the specified week");
+    } else {
+      // Set the response header to "application/json"
+      res.setHeader("Content-Type", "application/json");
+      // Return data as JSON response
+      res.json(timetable);
+      console.log(timetable);
+    }
   } catch (err) {
     // Handle error
     console.error(err);
     res.status(500).send("Server error");
   }
 });
+
 
 // Set up a registration API endpoint
 app.post("/register", async (req, res) => {
