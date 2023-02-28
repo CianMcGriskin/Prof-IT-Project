@@ -2,60 +2,64 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const mongoose = require("mongoose");
-const uuid = require('uuid');
 const app = express();
-const cookieParser = require('cookie-parser');
 
 // Set up body-parser and cors middleware
 app.use(bodyParser.json());
 app.use(cors());
-app.use(cookieParser());
+
 
 // Connect to MongoDB database
-mongoose.connect("mongodb+srv://batman:root@cluster0.tjfhrts.mongodb.net/Rosterota?retryWrites=true&w=majority", {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+mongoose.connect(
+  "mongodb+srv://batman:root@cluster0.tjfhrts.mongodb.net/Rosterota?retryWrites=true&w=majority",{
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  }
+);
 
 // Schemas of the backend
-const userSchema = new mongoose.Schema({
-  email: String,
-  password: String,
-}, { collection: "Users" });
+const userSchema = new mongoose.Schema(
+  {
+    email: String,
+    password: String,
+    userID: Number,
+    status: { type: String, default: "Pending" },
+  },
+  { collection: "Users" , versionKey: false}
+);
 
+// Define Mongoose schema
 const hoursSchema = new mongoose.Schema({
-  userID: String,
+  schedule: [mongoose.Schema.Types.Mixed],
+  userID: Number,
   weekID: String,
-  schedule: Array
-});
+},
+{ collection: "Hours" , versionKey: false});
+
+const registerRequestSchema = new mongoose.Schema(
+  {
+    UserID: Number,
+    status: { type: String, default: "Pending" },
+    hourlyRate: Number,
+  },
+  { collection: "RegisterRequests", versionKey: false }
+);
+
+const userInfoSchema = new mongoose.Schema({
+  firstName: String,
+  lastName: String,
+  phoneNumber: String,
+  userType: String,
+  companyID: Number,
+  userID: Number,
+}, { collection: "UserInfo" , versionKey: false});
+
 
 const Users = mongoose.model("User", userSchema);
-const Hours = mongoose.model('Hours', hoursSchema);
+const Hours = mongoose.model("Hours", hoursSchema);
+const RegisterRequests = mongoose.model("RegisterRequests", registerRequestSchema);
+const UserInfo = mongoose.model("UserInfo", userInfoSchema);
 
-app.get('/timetable', (req, res) => {
-  let userID = "1";
-  let weekID = "1";
-
-  // Find the 'hours' document for the specified user ID
-  Hours.findOne({ userID: userID, weekID: weekID}, (err, hours) => {
-    if (err) 
-      console.log("Error");
-    
-    if (!hours) 
-      console.log("Finding UserID & WeekID returned null");
-
-    console.log(hours);
-
-    // Find the schedule data for the specified week ID
-    const schedule = hours.schedule;
-    if (!schedule) 
-      console.log("scheudle not found");
-    
-    console.log(schedule);
-    // Return the schedule data for the specified week ID
-    return res.json(schedule);
-  });
-});
 
 // Set up a login API endpoint
 app.post("/", (req, res) => {
@@ -67,13 +71,13 @@ app.post("/", (req, res) => {
       res.status(500).send("Server error");
     } else if (!user) {
       res.status(400).send("Email not found");
-      console.log("Email not found")
+      console.log("Email not found");
     } else {
       // Check if password matches
       if (user.password === password /* && user.status === "Accepted" */) {
-        res.cookie('UserAuth', 'AuthTest', { httpOnly: false });
+        res.cookie("UserAuth", "AuthTest", { httpOnly: false });
         res.status(200).send("success");
-        console.log("Correct password and user is accepted")
+        console.log("Correct password and user is accepted");
       } else if (user.password === password && user.status != "Accepted") {
         res.status(400).send("User not accepted");
         console.log("User not accepted");
@@ -83,6 +87,100 @@ app.post("/", (req, res) => {
       }
     }
   });
+});
+
+app.get("/timetable", async (req, res) => {
+  try {
+    // Fetch data from "Hours" collection
+    const hours = await Hours.find();
+    // Return data as JSON response
+    res.json(hours);
+    console.log(hours)
+  } catch (err) {
+    // Handle error
+    console.error(err);
+    res.status(500).send("Server error");
+  }
+});
+
+app.get("/timetable/:weekId", async (req, res) => {
+  try {
+    const weekId = req.params.weekId;
+    // Fetch data from "Hours" collection for the specified week
+    console.log(weekId)
+    const timetable = await Hours.findOne({ weekID: weekId });
+    if (!timetable) {
+      // Return 404 status code if timetable for the specified week is not found
+      res.status(404).send("Timetable not found for the specified week");
+    } else {
+      // Set the response header to "application/json"
+      res.setHeader("Content-Type", "application/json");
+      // Return data as JSON response
+      res.json(timetable);
+      console.log(timetable);
+    }
+  } catch (err) {
+    // Handle error
+    console.error(err);
+    res.status(500).send("Server error");
+  }
+});
+
+
+// Set up a registration API endpoint
+app.post("/register", async (req, res) => {
+  const {
+    firstName,
+    surname,
+    email,
+    password,
+    phoneNumber,
+    companyID,
+  } = req.body;
+
+  try {
+    const { hourlyRate } = req.body;
+    // Find the latest user ID in the RegisterRequests collection
+    const latestRequest = await RegisterRequests.findOne(
+      {},
+      {},
+      { sort: { UserID: -1 } }
+    );
+    // Generate a new user ID by incrementing the latest ID by 1
+    const UserID = latestRequest ? latestRequest.UserID + 1 : 1;
+    // Create a new register request with default status "Pending"
+    const newRequest = new RegisterRequests({
+      UserID,
+      status: "Pending",
+      hourlyRate: hourlyRate || 12.11,
+    });
+    const userInfo = new UserInfo({
+      firstName,
+      lastName: surname,
+      phoneNumber,
+      userType: "employee",
+      companyID,
+      userID: UserID,
+    });
+
+    const users = new Users({
+      status: "Pending",
+      email,
+      password,
+      userID: UserID,
+    })
+    // Save the new request to the database
+    await userInfo.save();
+    await newRequest.save();
+    await users.save();
+
+    res.status(200).send("success");
+    console.log(`New register request saved: ${JSON.stringify(newRequest)}`);
+  } catch (err) {
+    // Handle error
+    console.error(err);
+    res.status(500).send("Server error");
+  }
 });
 
 // Start the server

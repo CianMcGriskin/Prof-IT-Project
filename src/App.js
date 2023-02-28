@@ -9,12 +9,11 @@ import TimetablePage from './components/Timetable/Timetable';
 function App() {
   return (
   <BrowserRouter>
-  <Routes>
-    <Route path="/" element={<LoginPage></LoginPage>} />
-    <Route path="/register" element={<RegisterPage></RegisterPage>} />
-    <Route path="/timetable" element={<TimetablePage></TimetablePage>} />
-  </Routes>
-  
+    <Routes>
+      <Route path="/" element={<LoginPage></LoginPage>} />
+      <Route path="/register" element={<RegisterPage></RegisterPage>} />
+      <Route path="/timetable" element={<TimetablePage></TimetablePage>} />
+    </Routes>
   </BrowserRouter>
   );
 }
