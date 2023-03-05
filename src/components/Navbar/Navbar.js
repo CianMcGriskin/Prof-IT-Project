@@ -12,6 +12,7 @@ function NavigationBar(){
           <Navbar.Brand>Grosterota</Navbar.Brand>
           <Nav className="me-auto">
             <Nav.Link href="/timetable">Timetable</Nav.Link>
+            <Nav.Link href="/CreateTimeTable">CreateTimeTable</Nav.Link>
             <Nav.Link as={LogoutComponent}>Logout</Nav.Link>
           </Nav>
         </Container>

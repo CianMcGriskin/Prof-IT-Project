@@ -4,6 +4,7 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const app = express();
 
+
 // Set up body-parser and cors middleware
 app.use(bodyParser.json());
 app.use(cors());
@@ -29,12 +30,18 @@ const userSchema = new mongoose.Schema(
 );
 
 // Define Mongoose schema
-const hoursSchema = new mongoose.Schema({
-  schedule: [mongoose.Schema.Types.Mixed],
-  userID: Number,
-  weekID: String,
-},
-{ collection: "Hours" , versionKey: false});
+const hoursSchema = new mongoose.Schema(
+  {
+    schedule: [{
+      day: String,
+      startTime: Date,
+      endTime: Date
+    }],
+    userID: Number,
+    weekID: String,
+  },
+  { collection: "Hours", versionKey: false }
+);
 
 const registerRequestSchema = new mongoose.Schema(
   {
@@ -127,6 +134,7 @@ app.get("/timetable/:weekId", async (req, res) => {
 });
 
 
+
 // Set up a registration API endpoint
 app.post("/register", async (req, res) => {
   const {
@@ -182,6 +190,42 @@ app.post("/register", async (req, res) => {
     res.status(500).send("Server error");
   }
 });
+
+
+app.use(express.json());
+
+// Connect to MongoDB
+
+
+// Handle POST request for submitting a schedule
+// Set up a submit-schedule API endpoint
+app.post("/submit-schedule", async (req, res) => {
+  const { userID, weekID, schedule } = req.body;
+  try {
+    // Check if the user exists in the database
+    const user = await Users.findOne({ userID });
+    if (!user) {
+      // Return 404 status code if user is not found
+      res.status(404).send(`User with ID ${userID} not found`);
+    } else {
+      // Save the weekly schedule to the database
+      const hours = new Hours({
+        userID,
+        weekID,
+        schedule,
+      });
+      await hours.save();
+      res.status(200).send(`Schedule for week ${weekID} saved for user ${userID}`);
+      console.log(`Schedule for week ${weekID} saved for user ${userID}`);
+    }
+  } catch (err) {
+    // Handle error
+    console.error(err);
+    res.status(500).send("Server error");
+  }
+});
+
+
 
 // Start the server
 let port = 4000;
