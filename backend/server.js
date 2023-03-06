@@ -237,6 +237,36 @@ app.get('/api/usertype', (req, res) => {
 });
 
 
+// GET all register requests
+app.get('/api/registerRequests', async (req, res) => {
+  try {
+    const requests = await RegisterRequests.find();
+    res.json(requests);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// PATCH a register request by ID
+app.patch('/api/registerRequests/:id', async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  try {
+    const updatedRequest = await RegisterRequests.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true }
+    );
+    if (!updatedRequest) {
+      return res.status(404).json({ message: "Register request not found" });
+    }
+    res.json(updatedRequest);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
 
 
 // Start the server

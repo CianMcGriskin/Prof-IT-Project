@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Link, Routes } from 'react-router-dom';
 import LoginPage from './components/LoginPage/LoginPage'
 import RegisterPage from './components/RegisterPage/RegisterPage';
 import CreateTimeTable from './components/CreateTimeTable/CreateTimeTable';
+import RegisterReq from './components/RegisterReq/RegisterReq';
 import logo from './logo.svg';
 import './App.css';
 import TimetablePage from './components/Timetable/Timetable';
@@ -15,6 +16,7 @@ function App() {
       <Route path="/register" element={<RegisterPage></RegisterPage>} />
       <Route path="/timetable" element={<TimetablePage></TimetablePage>} />
       <Route path="/CreateTimeTable" element={<CreateTimeTable></CreateTimeTable>} />
+      <Route path="/RegisterReq" element={<RegisterReq></RegisterReq>} />
     </Routes>
   </BrowserRouter>
   );

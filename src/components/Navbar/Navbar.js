@@ -11,6 +11,7 @@ function NavigationBar(){
   useEffect(() => {
     axios.get(`http://localhost:4000/api/usertype`).then((response) => {
       const userData = response.data;
+      console.log(userData);
       if (userData === 'Manager') {
         setIsManager(true);
       }
@@ -25,7 +26,7 @@ function NavigationBar(){
           <Nav className="me-auto">
             <Nav.Link href="/timetable">Timetable</Nav.Link>
             {isManager && <Nav.Link href="CreateTimeTable">Create Timetable</Nav.Link>}
-            {isManager && <Nav.Link>Register Requests</Nav.Link>}
+            {isManager && <Nav.Link href="RegisterReq">Register Requests</Nav.Link>}
             
             <Nav.Link as={LogoutComponent}>Logout</Nav.Link>
           </Nav>
