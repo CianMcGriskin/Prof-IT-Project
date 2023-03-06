@@ -5,7 +5,7 @@ import Cookies from 'js-cookie';
 
 const TimetablePage = () => {
   const [selectedWeek, setSelectedWeek] = useState('');
-  const [hoursData, setHoursData] = useState([]);
+  const [hoursData, setHoursData] = useState({});
 
   const hasAuthCookie = Cookies.get('Auth');
   if (!hasAuthCookie) {
@@ -16,7 +16,11 @@ const TimetablePage = () => {
     axios
       .get(`http://localhost:4000/timetable`)
       .then((response) => {
-        setHoursData(response.data);
+        const data = response.data.reduce((acc, curr) => {
+          acc[curr.weekID] = curr.schedule;
+          return acc;
+        }, {});
+        setHoursData(data);
       })
       .catch((error) => {
         console.error(error);
@@ -27,10 +31,7 @@ const TimetablePage = () => {
     setSelectedWeek(event.target.value);
   };
 
-  const filteredData =
-    selectedWeek !== ''
-      ? hoursData.filter((hours) => hours.weekID === selectedWeek)
-      : [];
+  const filteredData = hoursData[selectedWeek] || [];
 
   return (
     <div>
@@ -57,15 +58,15 @@ const TimetablePage = () => {
             </tr>
           </thead>
           <tbody>
-          {filteredData.map((hour) => (
-  <tr key={hour._id}>
-    <td>{hour.weekID}</td>
-    <td>{hour.schedule[0]}</td>
-    <td>{new Date(hour.schedule[1]).toLocaleTimeString()}</td>
-    <td>{new Date(hour.schedule[2]).toLocaleTimeString()}</td>
-    <td>{hour.schedule[3]}</td>
-  </tr>
-))}
+            {filteredData.map((schedule, index) => (
+              <tr key={index}>
+                <td>{selectedWeek}</td>
+                <td>{schedule[0]}</td>
+                <td>{new Date(schedule[1]).toLocaleTimeString()}</td>
+                <td>{new Date(schedule[2]).toLocaleTimeString()}</td>
+                <td>{schedule[3]}</td>
+              </tr>
+            ))}
           </tbody>
         </table>
       )}
