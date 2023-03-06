@@ -78,7 +78,7 @@ app.post("/", (req, res) => {
       console.log("Email not found");
     } else {
       // Check if password matches
-      if (user.password === password /* && user.status === "Accepted" */) {
+      if (user.password === password  && user.status == "Approved" ) {
         //res.cookie("UserAuth", "AuthTest", { httpOnly: false });
         res.status(200).send("success");
         console.log("Correct password and user is accepted");
@@ -146,7 +146,6 @@ app.post('/api/hours', async (req, res) => {
   }
 });
 
-// Set up a registration API endpoint
 app.post("/register", async (req, res) => {
   const {
     firstName,
@@ -158,6 +157,12 @@ app.post("/register", async (req, res) => {
   } = req.body;
 
   try {
+    // Check if email already exists in the Users collection
+    const existingUser = await Users.findOne({ email });
+    if (existingUser) {
+      return res.status(400).send("Email already exists");
+    }
+
     const { hourlyRate } = req.body;
     // Find the latest user ID in the RegisterRequests collection
     const latestRequest = await RegisterRequests.findOne(
@@ -178,7 +183,7 @@ app.post("/register", async (req, res) => {
       firstName,
       lastName: surname,
       phoneNumber,
-      userType: "employee",
+      userType: "Employee",
       companyID,
       userID: UserID,
     });
@@ -188,7 +193,7 @@ app.post("/register", async (req, res) => {
       email,
       password,
       userID: UserID,
-    })
+    });
     // Save the new request to the database
     await userInfo.save();
     await newRequest.save();
@@ -202,6 +207,7 @@ app.post("/register", async (req, res) => {
     res.status(500).send("Server error");
   }
 });
+
 
 app.get('/api/userid', (req, res) => {
   const email = req.cookies.Auth;
@@ -240,34 +246,46 @@ app.get('/api/usertype', (req, res) => {
 // GET all register requests
 app.get('/api/registerRequests', async (req, res) => {
   try {
-    const requests = await RegisterRequest.find();
+    const requests = await RegisterRequests.find();
     res.json(requests);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
 
-// PATCH a register request by ID
+
 app.patch('/api/registerRequests/:id', async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
 
   try {
-    const updatedRequest = await RegisterRequest.findByIdAndUpdate(
+    // Update register request
+    const updatedRequest = await RegisterRequests.findByIdAndUpdate(
       id,
       { status },
       { new: true }
     );
+
     if (!updatedRequest) {
       return res.status(404).json({ message: "Register request not found" });
     }
-    res.json(updatedRequest);
+
+    // Update corresponding user
+    const updatedUser = await Users.findOneAndUpdate(
+      { userID: updatedRequest.UserID },
+      { status },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({ updatedRequest, updatedUser });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 });
-
-
 
 // Start the server
 let port = 4000;

@@ -14,16 +14,17 @@ const RegisterReq = () => {
     fetchData();
   }, []);
 
-  const handleApprove = async (id) => {
+  const handleApprove = async (id, userID) => {
     const response = await axios.patch(`http://localhost:4000/api/registerRequests/${id}`, {
       status: 'Approved'
     });
     if (response.status === 200) {
+      console.log("User ID:", userID); // added console log here
       const updatedRequests = registerRequests.map(req => {
         if (req._id === id) {
           return {
             ...req,
-            status: 'Approved'
+            status: 'Approved',
           };
         } else {
           return req;
@@ -32,6 +33,8 @@ const RegisterReq = () => {
       setRegisterRequests(updatedRequests);
     }
   };
+  
+  
 
   return (
     <div>
@@ -55,7 +58,7 @@ const RegisterReq = () => {
                 <td>{req.hourlyRate}</td>
                 <td>
                   {req.status === 'Pending' && (
-                    <button onClick={() => handleApprove(req._id)}>Approve</button>
+                    <button onClick={() => handleApprove(req._id, req.UserID)}>Approve</button>
                   )}
                 </td>
               </tr>
