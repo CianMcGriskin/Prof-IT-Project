@@ -4,41 +4,60 @@ import { Link } from "react-router-dom";
 
 
 const CreateTimeTable = () => {
-    const [timetable, setTimetable] = useState({
-      sunday: { id: '', startTime: '', endTime: '', totalHours: 0 },
-      monday: { id: '', startTime: '', endTime: '', totalHours: 0 },
-      tuesday: { id: '', startTime: '', endTime: '', totalHours: 0 },
-      wednesday: { id: '', startTime: '', endTime: '', totalHours: 0 },
-      thursday: { id: '', startTime: '', endTime: '', totalHours: 0 },
-      friday: { id: '', startTime: '', endTime: '', totalHours: 0 },
-      saturday: { id: '', startTime: '', endTime: '', totalHours: 0 },
-    });
-    const [userid, setUserid] = useState('');
-    const [weekid, setWeekid] = useState('');
+  const [userid, setUserid] = useState("");
+  const [weekid, setWeekid] = useState("");
+  const [timetable, setTimetable] = useState({
+    sunday: { startTime: "", endTime: "", totalHours: 0 },
+    monday: { startTime: "", endTime: "", totalHours: 0 },
+    tuesday: { startTime: "", endTime: "", totalHours: 0 },
+    wednesday: { startTime: "", endTime: "", totalHours: 0 },
+    thursday: { startTime: "", endTime: "", totalHours: 0 },
+    friday: { startTime: "", endTime: "", totalHours: 0 },
+    saturday: { startTime: "", endTime: "", totalHours: 0 }
+  });
 
-    const handleChange = (event) => {
-      const { name, value } = event.target;
-      const [day, field] = name.split('.');
-      const newTimetable = { ...timetable };
-      newTimetable[day][field] = value;
-      if (field === 'startTime' || field === 'endTime') {
-        const startTime = new Date(`1970-01-01T${newTimetable[day].startTime}:00Z`);
-        const endTime = new Date(`1970-01-01T${newTimetable[day].endTime}:00Z`);
-        newTimetable[day].totalHours = (endTime - startTime) / 1000 / 60 / 60;
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    const day = name.split(".")[0];
+    const field = name.split(".")[1];
+    const newTimetable = {
+      ...timetable,
+      [day]: {
+        ...timetable[day],
+        [field]: value,
+        totalHours: calculateTotalHours(day, value, timetable[day].endTime)
       }
-      setTimetable(newTimetable);
     };
-  
-    const handleSubmit = (event) => {
-      event.preventDefault();
-      axios.post('http://localhost:4000/submit-schedule', { timetable })
-        .then(response => {
-          console.log(response.data);
-        })
-        .catch(error => {
-          console.log(error);
-        });
+    setTimetable(newTimetable);
+  };
+
+  const calculateTotalHours = (day, startTime, endTime) => {
+    if (!startTime || !endTime) return 0;
+    const start = new Date(`2001-01-01T${startTime}:00`);
+    const end = new Date(`2001-01-01T${endTime}:00`);
+    const diff = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
+    return diff > 0 ? diff : diff + 24;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const data = {
+      schedule: Object.entries(timetable).map(([day, { startTime, endTime }]) => [
+        day,
+        new Date(`2001-01-01T${startTime}:00`).toISOString(),
+        new Date(`2001-01-01T${endTime}:00`).toISOString(),
+        calculateTotalHours(day, startTime, endTime)
+      ]),
+      userID: userid,
+      weekID: weekid
     };
+    try {
+      const response = await axios.post("http://localhost:4000/api/hours", data);
+      console.log(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <form onSubmit={handleSubmit}>

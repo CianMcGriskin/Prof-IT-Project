@@ -1,36 +1,40 @@
-import NavigationBar from '../Navbar/Navbar'
+import NavigationBar from '../Navbar/Navbar';
 import axios from 'axios';
 import { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
 
 const TimetablePage = () => {
-  const [selectedWeek, setSelectedWeek] = useState("");
+  const [selectedWeek, setSelectedWeek] = useState('');
   const [hoursData, setHoursData] = useState([]);
 
   const hasAuthCookie = Cookies.get('Auth');
   if (!hasAuthCookie) {
-    window.location.href = "/";
+    window.location.href = '/';
   }
 
   useEffect(() => {
-    axios.get(`http://localhost:4000/timetable`)
-      .then(response => {
+    axios
+      .get(`http://localhost:4000/timetable`)
+      .then((response) => {
         setHoursData(response.data);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error(error);
       });
   }, []);
 
   const handleWeekChange = (event) => {
     setSelectedWeek(event.target.value);
-  }
+  };
 
-  const filteredData = selectedWeek !== "" ? hoursData.filter(hours => hours.weekID === selectedWeek) : [];
+  const filteredData =
+    selectedWeek !== ''
+      ? hoursData.filter((hours) => hours.weekID === selectedWeek)
+      : [];
 
   return (
     <div>
-      <NavigationBar/>
+      <NavigationBar />
       <div>
         <label htmlFor="week-select">Select Week:</label>
         <select id="week-select" value={selectedWeek} onChange={handleWeekChange}>
@@ -53,15 +57,15 @@ const TimetablePage = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredData.map((hour) => (
-              <tr key={hour._id}>
-                <td>{hour.weekID}</td>
-                <td>{hour.schedule[0]}</td>
-                <td>{new Date(hour.schedule[1]).toLocaleTimeString()}</td>
-                <td>{new Date(hour.schedule[2]).toLocaleTimeString()}</td>
-                <td>{hour.schedule[3]}</td>
-              </tr>
-            ))}
+          {filteredData.map((hour) => (
+  <tr key={hour._id}>
+    <td>{hour.weekID}</td>
+    <td>{hour.schedule[0]}</td>
+    <td>{new Date(hour.schedule[1]).toLocaleTimeString()}</td>
+    <td>{new Date(hour.schedule[2]).toLocaleTimeString()}</td>
+    <td>{hour.schedule[3]}</td>
+  </tr>
+))}
           </tbody>
         </table>
       )}
