@@ -3,10 +3,12 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const app = express();
+const cookieParser = require('cookie-parser');
 
 // Set up body-parser and cors middleware
 app.use(bodyParser.json());
 app.use(cors());
+
 
 
 // Connect to MongoDB database
@@ -75,7 +77,7 @@ app.post("/", (req, res) => {
     } else {
       // Check if password matches
       if (user.password === password /* && user.status === "Accepted" */) {
-        res.cookie("UserAuth", "AuthTest", { httpOnly: false });
+        //res.cookie("UserAuth", "AuthTest", { httpOnly: false });
         res.status(200).send("success");
         console.log("Correct password and user is accepted");
       } else if (user.password === password && user.status != "Accepted") {
@@ -169,6 +171,7 @@ app.post("/register", async (req, res) => {
       status: "Pending",
       hourlyRate: hourlyRate || 12.11,
     });
+
     const userInfo = new UserInfo({
       firstName,
       lastName: surname,
@@ -197,6 +200,42 @@ app.post("/register", async (req, res) => {
     res.status(500).send("Server error");
   }
 });
+
+app.get('/api/userid', (req, res) => {
+  const email = req.cookies.Auth;
+  Users.findOne({ Email: email }, (err, user) => {
+    if (err) {
+      console.log(err);
+      res.status(500).send('Error retrieving user ID');
+    } else {
+      res.json(user.userID);
+    }
+  });
+});
+
+
+app.get('/api/usertype', (req, res) => {
+  const email = req.cookies.Auth;
+  Users.findOne({ Email: email }, (err, user) => {
+    if (err) {
+      res.status(500).send('Error retrieving user ID');
+    } else {
+      const userId = user.userID;
+      UserInfo.findOne({ UserID: userId }, (err, user) => {
+        if (err) {
+          console.log(err);
+          res.status(500).send('Error retrieving user information');
+        } else {
+          const userType = user.userType;
+          res.json(userType);
+        }
+      });
+    }
+  });
+});
+
+
+
 
 // Start the server
 let port = 4000;
