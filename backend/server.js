@@ -247,21 +247,34 @@ app.get('/api/registerRequests', async (req, res) => {
   }
 });
 
-// PATCH a register request by ID
 app.patch('/api/registerRequests/:id', async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
 
   try {
+    // Update register request
     const updatedRequest = await RegisterRequests.findByIdAndUpdate(
       id,
       { status },
       { new: true }
     );
+
     if (!updatedRequest) {
       return res.status(404).json({ message: "Register request not found" });
     }
-    res.json(updatedRequest);
+
+    // Update user status
+    const updatedUser = await Users.findOneAndUpdate(
+      { UserID: updatedRequest.UserID },
+      { status },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({ updatedRequest, updatedUser });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
