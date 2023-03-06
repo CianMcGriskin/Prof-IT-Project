@@ -7,7 +7,7 @@ const CreateTimeTable = () => {
   const [userid, setUserid] = useState("");
   const [weekid, setWeekid] = useState("");
   const [timetable, setTimetable] = useState({
-    sunday: { startTime: "", endTime: "", totalHours: 0 },
+    Sunday: { startTime: "", endTime: "", totalHours: 0 },
     monday: { startTime: "", endTime: "", totalHours: 0 },
     tuesday: { startTime: "", endTime: "", totalHours: 0 },
     wednesday: { startTime: "", endTime: "", totalHours: 0 },
@@ -71,11 +71,11 @@ const CreateTimeTable = () => {
         </div>
         <div></div>
       <div>
-        <label htmlFor="sunday.startTime">Sunday start time:</label>
-        <input type="time" name="sunday.startTime" value={timetable.sunday.startTime} onChange={handleChange} str="required" />
-        <label htmlFor="sunday.endTime">Sunday end time:</label>
-        <input type="time" name="sunday.endTime" value={timetable.sunday.endTime} onChange={handleChange} str="required" />
-        <span>Total hours: {timetable.sunday.totalHours.toFixed(2)}</span>
+        <label htmlFor="Sunday.startTime">Sunday start time:</label>
+        <input type="time" name="Sunday.startTime" value={timetable.Sunday.startTime} onChange={handleChange} str="required" />
+        <label htmlFor="Sunday.endTime">Sunday end time:</label>
+        <input type="time" name="Sunday.endTime" value={timetable.Sunday.endTime} onChange={handleChange} str="required" />
+        <span>Total hours: {timetable.Sunday.totalHours.toFixed(2)}</span>
       </div>
       <div>
         <label htmlFor="monday.startTime">Monday start time:</label>
