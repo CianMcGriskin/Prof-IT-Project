@@ -24,9 +24,9 @@ function NavigationBar(){
           <Navbar.Brand>Grosterota</Navbar.Brand>
           <Nav className="me-auto">
             <Nav.Link href="/timetable">Timetable</Nav.Link>
-            <Nav.Link href="/CreateTimeTable">CreateTimeTable</Nav.Link>
+            {isManager && <Nav.Link href="CreateTimeTable">Create Timetable</Nav.Link>}
             {isManager && <Nav.Link>Register Requests</Nav.Link>}
-            {isManager && <Nav.Link>Create Timetable</Nav.Link>}
+            
             <Nav.Link as={LogoutComponent}>Logout</Nav.Link>
           </Nav>
         </Container>
