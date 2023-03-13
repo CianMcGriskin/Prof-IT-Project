@@ -128,6 +128,46 @@ app.get("/timetable/:weekId", async (req, res) => {
   });
 });
 
+app.put("/timetable/:weekId", async (req, res) => {
+  try {
+    const weekId = req.params.weekId;
+    // Fetch data from "Hours" collection for the specified week
+    const timetable = await Hours.findOne({ weekID: weekId });
+    if (!timetable) {
+      // Return 404 status code if timetable for the specified week is not found
+      res.status(404).send("Timetable not found for the specified week");
+    } else {
+      // Update the timetable data
+      timetable.data = req.body;
+      // Save the updated timetable to the database
+      await timetable.save();
+      // Set the response header to "application/json"
+      res.setHeader("Content-Type", "application/json");
+      // Return the updated timetable as JSON response
+      res.json(timetable);
+    }
+  } catch (err) {
+    // Handle error
+    console.error(err);
+    res.status(500).send("Server error");
+  }
+});
+
+app.post('/api/hours', async (req, res) => {
+  try {
+    const { schedule, userID, weekID } = req.body;
+    const hours = new Hours({
+      schedule,
+      userID,
+      weekID,
+    });
+    const savedHours = await hours.save();
+    res.json(savedHours);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
 
 // Set up a registration API endpoint
 app.post("/register", async (req, res) => {
@@ -248,6 +288,19 @@ app.get('/api/registerRequests', async (req, res) => {
 });
 
 
+// GET all register requests
+app.get('/api/userinfo', async (req, res) => {
+  try {
+    const userInfo = await UserInfo.find({}, { _id: 0, __v: 0 });
+    res.json(userInfo);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server error');
+  }
+});
+
+
+
 app.patch('/api/registerRequests/:id', async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
@@ -280,6 +333,8 @@ app.patch('/api/registerRequests/:id', async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 });
+
+
 
 // Start the server
 let port = 4000;

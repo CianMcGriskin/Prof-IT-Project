@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+
 import NavigationBar from '../Navbar/Navbar';
 import axios from 'axios';
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
 
@@ -40,6 +41,21 @@ const CreateTimeTable = () => {
     return diff > 0 ? diff : diff + 24;
   };
 
+  const [userInfo, setUserInfo] = useState([]);
+
+  const fetchUserInfo = async () => {
+    try {
+      const response = await axios.get("http://localhost:4000/api/userinfo");
+      setUserInfo(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  
+  useEffect(() => {
+    fetchUserInfo();
+  }, []);
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     const data = {
@@ -62,9 +78,9 @@ const CreateTimeTable = () => {
 
   return (
     <div>
-     < NavigationBar/>
-    <form onSubmit={handleSubmit}>
-                <div>
+      < NavigationBar />
+      <form onSubmit={handleSubmit}>
+        <div>
           <label htmlFor="userid">User ID:</label>
           <input type="text" name="userid" value={userid} onChange={(e) => setUserid(e.target.value)} required />
         </div>
@@ -73,58 +89,83 @@ const CreateTimeTable = () => {
           <input type="text" name="weekid" value={weekid} onChange={(e) => setWeekid(e.target.value)} required />
         </div>
         <div></div>
-      <div>
-        <label htmlFor="Sunday.startTime">Sunday start time:</label>
-        <input type="time" name="Sunday.startTime" value={timetable.Sunday.startTime} onChange={handleChange} str="required" />
-        <label htmlFor="Sunday.endTime">Sunday end time:</label>
-        <input type="time" name="Sunday.endTime" value={timetable.Sunday.endTime} onChange={handleChange} str="required" />
-        <span>Total hours: {timetable.Sunday.totalHours.toFixed(2)}</span>
-      </div>
-      <div>
-        <label htmlFor="Monday.startTime">Monday start time:</label>
-        <input type="time" name="Monday.startTime" value={timetable.Monday.startTime} onChange={handleChange} str="required" />
-        <label htmlFor="Monday.endTime">Monday end time:</label>
-        <input type="time" name="Monday.endTime" value={timetable.Monday.endTime} onChange={handleChange} str="required" />
-        <span>Total hours: {timetable.Monday.totalHours.toFixed(2)}</span>
-      </div>
-      <div>
-        <label htmlFor="Tuesday.startTime">Tuesday start time:</label>
-        <input type="time" name="Tuesday.startTime" value={timetable.Tuesday.startTime} onChange={handleChange} str="required" />
-        <label htmlFor="Tuesday.endTime">Tuesday end time:</label>
-        <input type="time" name="Tuesday.endTime" value={timetable.Tuesday.endTime} onChange={handleChange} str="required" />
-        <span>Total hours: {timetable.Tuesday.totalHours.toFixed(2)}</span>
-      </div>
-      <div>
-        <label htmlFor="Wednesday.startTime">Wednesday start time:</label>
-        <input type="time" name="Wednesday.startTime" value={timetable.Wednesday.startTime} onChange={handleChange} str="required" />
-        <label htmlFor="Wednesday.endTime">Wednesday end time:</label>
-        <input type="time" name="Wednesday.endTime" value={timetable.Wednesday.endTime} onChange={handleChange} str="required" />
-        <span>Total hours: {timetable.Wednesday.totalHours.toFixed(2)}</span>
-      </div>
-      <div>
-        <label htmlFor="Thursday.startTime">Thursday start time:</label>
-        <input type="time" name="Thursday.startTime" value={timetable.Thursday.startTime} onChange={handleChange} str="required" />
-        <label htmlFor="Thursday.endTime">Thursday end time:</label>
-        <input type="time" name="Thursday.endTime" value={timetable.Thursday.endTime} onChange={handleChange} str="required" />
-        <span>Total hours: {timetable.Thursday.totalHours.toFixed(2)}</span>
-      </div>
-      <div>
-        <label htmlFor="Friday.startTime">Friday start time:</label>
-        <input type="time" name="Friday.startTime" value={timetable.Friday.startTime} onChange={handleChange} str="required" />
-        <label htmlFor="Friday.endTime">Friday end time:</label>
-        <input type="time" name="Friday.endTime" value={timetable.Friday.endTime} onChange={handleChange} str="required" />
-        <span>Total hours: {timetable.Friday.totalHours.toFixed(2)}</span>
-      </div>
-      <div>
-        <label htmlFor="Saturday.startTime">Saturday start time:</label>
-        <input type="time" name="Saturday.startTime" value={timetable.Saturday.startTime} onChange={handleChange} str="required" />
-        <label htmlFor="Saturday.endTime">Saturday end time:</label>
-        <input type="time" name="Saturday.endTime" value={timetable.Saturday.endTime} onChange={handleChange} str="required" />
-        <span>Total hours: {timetable.Saturday.totalHours.toFixed(2)}</span>
-      </div>
-      <button type="submit">Submit</button>
-            </form>
-            </div>
+        <div>
+          <label htmlFor="Sunday.startTime">Sunday start time:</label>
+          <input type="time" name="Sunday.startTime" value={timetable.Sunday.startTime} onChange={handleChange} str="required" />
+          <label htmlFor="Sunday.endTime">Sunday end time:</label>
+          <input type="time" name="Sunday.endTime" value={timetable.Sunday.endTime} onChange={handleChange} str="required" />
+          <span>Total hours: {timetable.Sunday.totalHours.toFixed(2)}</span>
+        </div>
+        <div>
+          <label htmlFor="Monday.startTime">Monday start time:</label>
+          <input type="time" name="Monday.startTime" value={timetable.Monday.startTime} onChange={handleChange} str="required" />
+          <label htmlFor="Monday.endTime">Monday end time:</label>
+          <input type="time" name="Monday.endTime" value={timetable.Monday.endTime} onChange={handleChange} str="required" />
+          <span>Total hours: {timetable.Monday.totalHours.toFixed(2)}</span>
+        </div>
+        <div>
+          <label htmlFor="Tuesday.startTime">Tuesday start time:</label>
+          <input type="time" name="Tuesday.startTime" value={timetable.Tuesday.startTime} onChange={handleChange} str="required" />
+          <label htmlFor="Tuesday.endTime">Tuesday end time:</label>
+          <input type="time" name="Tuesday.endTime" value={timetable.Tuesday.endTime} onChange={handleChange} str="required" />
+          <span>Total hours: {timetable.Tuesday.totalHours.toFixed(2)}</span>
+        </div>
+        <div>
+          <label htmlFor="Wednesday.startTime">Wednesday start time:</label>
+          <input type="time" name="Wednesday.startTime" value={timetable.Wednesday.startTime} onChange={handleChange} str="required" />
+          <label htmlFor="Wednesday.endTime">Wednesday end time:</label>
+          <input type="time" name="Wednesday.endTime" value={timetable.Wednesday.endTime} onChange={handleChange} str="required" />
+          <span>Total hours: {timetable.Wednesday.totalHours.toFixed(2)}</span>
+        </div>
+        <div>
+          <label htmlFor="Thursday.startTime">Thursday start time:</label>
+          <input type="time" name="Thursday.startTime" value={timetable.Thursday.startTime} onChange={handleChange} str="required" />
+          <label htmlFor="Thursday.endTime">Thursday end time:</label>
+          <input type="time" name="Thursday.endTime" value={timetable.Thursday.endTime} onChange={handleChange} str="required" />
+          <span>Total hours: {timetable.Thursday.totalHours.toFixed(2)}</span>
+        </div>
+        <div>
+          <label htmlFor="Friday.startTime">Friday start time:</label>
+          <input type="time" name="Friday.startTime" value={timetable.Friday.startTime} onChange={handleChange} str="required" />
+          <label htmlFor="Friday.endTime">Friday end time:</label>
+          <input type="time" name="Friday.endTime" value={timetable.Friday.endTime} onChange={handleChange} str="required" />
+          <span>Total hours: {timetable.Friday.totalHours.toFixed(2)}</span>
+        </div>
+        <div>
+          <label htmlFor="Saturday.startTime">Saturday start time:</label>
+          <input type="time" name="Saturday.startTime" value={timetable.Saturday.startTime} onChange={handleChange} str="required" />
+          <label htmlFor="Saturday.endTime">Saturday end time:</label>
+          <input type="time" name="Saturday.endTime" value={timetable.Saturday.endTime} onChange={handleChange} str="required" />
+          <span>Total hours: {timetable.Saturday.totalHours.toFixed(2)}</span>
+        </div>
+        <button type="submit">Submit</button>
+      </form>
+      <table>
+  <thead>
+    <tr>
+      <th>User ID</th>
+      <th>First Name</th>
+      <th>Last Name</th>
+      <th>Phone Number</th>
+      <th>User Type</th>
+      <th>Company ID</th>
+    </tr>
+  </thead>
+  <tbody>
+    {userInfo.map((user) => (
+      <tr key={user.userID}>
+        <td>{user.userID}</td>
+        <td>{user.firstName}</td>
+        <td>{user.lastName}</td>
+        <td>{user.phoneNumber}</td>
+        <td>{user.userType}</td>
+        <td>{user.companyID}</td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+
+    </div>
   );
 };
 
