@@ -19,7 +19,7 @@ const RegisterReq = () => {
       status: 'Approved'
     });
     if (response.status === 200) {
-      console.log("User ID:", userID); // added console log here
+      console.log("User ID:", userID);  
       const updatedRequests = registerRequests.map(req => {
         if (req._id === id) {
           return {

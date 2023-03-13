@@ -46,7 +46,7 @@ const registerRequestSchema = new mongoose.Schema(
     status: { type: String, default: "Pending" },
     hourlyRate: Number,
   },
-  { collection: "RegisterRequests", versionKey: false }
+{ collection: "RegisterRequests",versionKey: false }
 );
 
 const userInfoSchema = new mongoose.Schema({
@@ -234,7 +234,7 @@ app.get('/api/usertype', (req, res) => {
           console.log(err);
           res.status(500).send('Error retrieving user information');
         } else {
-          const userType = user.userType;
+          const userType = user.userType;  
           res.json(userType);
         }
       });
