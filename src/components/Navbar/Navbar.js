@@ -9,7 +9,7 @@ function NavigationBar(){
   const [isManager, setIsManager] = useState(false);
 
   useEffect(() => {
-    axios.get(`http://localhost:4000/api/usertype`).then((response) => {
+    axios.get(`http://localhost:4000/api/usertype`, {withCredentials: true}).then((response) => {
       const userData = response.data;
       console.log(userData);
       if (userData === 'Manager') {
@@ -17,6 +17,14 @@ function NavigationBar(){
       }
     });
   });
+
+  const cookies = document.cookie.split(';');
+const cookieMap = {};
+cookies.forEach(cookie => {
+  const parts = cookie.split('=');
+  cookieMap[parts[0].trim()] = parts[1].trim();
+});
+const authCookie = cookieMap.Auth;
   
   return (
     <>

@@ -5,10 +5,9 @@ const mongoose = require("mongoose");
 const cookieParser = require('cookie-parser');
 const app = express();
 
-
 // Set up body-parser and cors middleware
 app.use(bodyParser.json());
-app.use(cors());
+app.use(cors({credentials: true, origin: 'http://localhost:3000'}));
 app.use(cookieParser());
 
 
@@ -78,8 +77,8 @@ app.post("/", (req, res) => {
       console.log("Email not found");
     } else {
       // Check if password matches
-      if (user.password === password  && user.status == "Approved" ) {
-        //res.cookie("UserAuth", "AuthTest", { httpOnly: false });
+      if (user.password === password /* && user.status === "Accepted" */) {
+        res.cookie("UserAuth", "AuthTest", { httpOnly: false });
         res.status(200).send("success");
         console.log("Correct password and user is accepted");
       } else if (user.password === password && user.status != "Accepted") {
@@ -99,7 +98,6 @@ app.get("/timetable", async (req, res) => {
     const hours = await Hours.find();
     // Return data as JSON response
     res.json(hours);
-    console.log(hours)
   } catch (err) {
     // Handle error
     console.error(err);
@@ -111,7 +109,6 @@ app.get("/timetable/:weekId", async (req, res) => {
   try {
     const weekId = req.params.weekId;
     // Fetch data from "Hours" collection for the specified week
-    console.log(weekId)
     const timetable = await Hours.findOne({ weekID: weekId });
     if (!timetable) {
       // Return 404 status code if timetable for the specified week is not found
@@ -121,7 +118,6 @@ app.get("/timetable/:weekId", async (req, res) => {
       res.setHeader("Content-Type", "application/json");
       // Return data as JSON response
       res.json(timetable);
-      console.log(timetable);
     }
   } catch (err) {
     // Handle error
@@ -130,22 +126,8 @@ app.get("/timetable/:weekId", async (req, res) => {
   }
 });
 
-app.post('/api/hours', async (req, res) => {
-  try {
-    const { schedule, userID, weekID } = req.body;
-    const hours = new Hours({
-      schedule,
-      userID,
-      weekID,
-    });
-    const savedHours = await hours.save();
-    res.json(savedHours);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-});
 
+// Set up a registration API endpoint
 app.post("/register", async (req, res) => {
   const {
     firstName,
@@ -157,12 +139,6 @@ app.post("/register", async (req, res) => {
   } = req.body;
 
   try {
-    // Check if email already exists in the Users collection
-    const existingUser = await Users.findOne({ email });
-    if (existingUser) {
-      return res.status(400).send("Email already exists");
-    }
-
     const { hourlyRate } = req.body;
     // Find the latest user ID in the RegisterRequests collection
     const latestRequest = await RegisterRequests.findOne(
@@ -178,12 +154,11 @@ app.post("/register", async (req, res) => {
       status: "Pending",
       hourlyRate: hourlyRate || 12.11,
     });
-
     const userInfo = new UserInfo({
       firstName,
       lastName: surname,
       phoneNumber,
-      userType: "Employee",
+      userType: "employee",
       companyID,
       userID: UserID,
     });
@@ -193,7 +168,7 @@ app.post("/register", async (req, res) => {
       email,
       password,
       userID: UserID,
-    });
+    })
     // Save the new request to the database
     await userInfo.save();
     await newRequest.save();
@@ -208,7 +183,6 @@ app.post("/register", async (req, res) => {
   }
 });
 
-
 app.get('/api/userid', (req, res) => {
   const email = req.cookies.Auth;
   Users.findOne({ Email: email }, (err, user) => {
@@ -216,6 +190,7 @@ app.get('/api/userid', (req, res) => {
       console.log(err);
       res.status(500).send('Error retrieving user ID');
     } else {
+
       res.json(user.userID);
     }
   });
@@ -223,13 +198,15 @@ app.get('/api/userid', (req, res) => {
 
 
 app.get('/api/usertype', (req, res) => {
-  const email = req.cookies.Auth;
+  let email = req.cookies.Auth;
+  console.log(email)
   Users.findOne({ Email: email }, (err, user) => {
     if (err) {
       res.status(500).send('Error retrieving user ID');
     } else {
       const userId = user.userID;
-      UserInfo.findOne({ UserID: userId }, (err, user) => {
+      console.log(userId);
+      UserInfo.findOne({ UserID: userId }, (err, userInfo) => {
         if (err) {
           console.log(err);
           res.status(500).send('Error retrieving user information');
