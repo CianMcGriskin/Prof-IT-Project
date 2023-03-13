@@ -1,4 +1,3 @@
-
 import NavigationBar from '../Navbar/Navbar';
 import axios from 'axios';
 import React, { useState, useEffect } from "react";
@@ -146,9 +145,7 @@ const CreateTimeTable = () => {
       <th>User ID</th>
       <th>First Name</th>
       <th>Last Name</th>
-      <th>Phone Number</th>
       <th>User Type</th>
-      <th>Company ID</th>
     </tr>
   </thead>
   <tbody>
@@ -157,13 +154,12 @@ const CreateTimeTable = () => {
         <td>{user.userID}</td>
         <td>{user.firstName}</td>
         <td>{user.lastName}</td>
-        <td>{user.phoneNumber}</td>
         <td>{user.userType}</td>
-        <td>{user.companyID}</td>
       </tr>
     ))}
   </tbody>
 </table>
+
 
     </div>
   );

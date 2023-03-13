@@ -17,6 +17,7 @@ function App() {
       <Route path="/timetable" element={<TimetablePage></TimetablePage>} />
       <Route path="/CreateTimeTable" element={<CreateTimeTable></CreateTimeTable>} />
       <Route path="/RegisterReq" element={<RegisterReq></RegisterReq>} />
+
     </Routes>
   </BrowserRouter>
   );
