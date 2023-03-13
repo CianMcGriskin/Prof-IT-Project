@@ -12,6 +12,7 @@ app.use(cookieParser());
 
 
 
+
 // Connect to MongoDB database
 mongoose.connect(
   "mongodb+srv://batman:root@cluster0.tjfhrts.mongodb.net/Rosterota?retryWrites=true&w=majority",{
@@ -92,38 +93,39 @@ app.post("/", (req, res) => {
   });
 });
 
-app.get("/timetable", async (req, res) => {
-  try {
-    // Fetch data from "Hours" collection
-    const hours = await Hours.find();
-    // Return data as JSON response
-    res.json(hours);
-  } catch (err) {
-    // Handle error
-    console.error(err);
-    res.status(500).send("Server error");
-  }
-});
 
+
+//Only display based on User ID - get user id and only display content of timetable with that user id
 app.get("/timetable/:weekId", async (req, res) => {
-  try {
-    const weekId = req.params.weekId;
-    // Fetch data from "Hours" collection for the specified week
-    const timetable = await Hours.findOne({ weekID: weekId });
-    if (!timetable) {
-      // Return 404 status code if timetable for the specified week is not found
-      res.status(404).send("Timetable not found for the specified week");
+  const email = req.cookies.Auth;
+  console.log(userId);
+  Users.findOne({ email }, async (err, user) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send("Server error");
     } else {
-      // Set the response header to "application/json"
-      res.setHeader("Content-Type", "application/json");
-      // Return data as JSON response
-      res.json(timetable);
+      const userId = user.userID;
+      console.log(userId);
+      try {
+        const weekId = req.params.weekId;
+        // Fetch data from "Hours" collection for the specified week and user
+        const timetable = await Hours.find({ weekID: {$eq: weekId}, userID: {$eq: userId} });
+        if (timetable.length === 0) {
+          // Return 404 status code if timetable for the specified week is not found
+          res.status(404).send("Timetable not found for the specified week");
+        } else {
+          // Set the response header to "application/json"
+          res.setHeader("Content-Type", "application/json");
+          // Return data as JSON response
+          res.json(timetable);
+        }
+      } catch (err) {
+        // Handle error
+        console.error(err);
+        res.status(500).send("Server error");
+      }
     }
-  } catch (err) {
-    // Handle error
-    console.error(err);
-    res.status(500).send("Server error");
-  }
+  });
 });
 
 
@@ -204,6 +206,7 @@ app.get('/api/usertype', (req, res) => {
       res.status(500).send('Error retrieving user ID');
     } else {
       const userId = user.userID;
+      app.locals.currentUserID = userId;
       UserInfo.findOne({ userID: userId }, (err, userInfo) => {
         if (err) {
           console.log(err);
@@ -215,6 +218,21 @@ app.get('/api/usertype', (req, res) => {
       });
     }
   });
+});
+
+app.get("/timetable", async (req, res) => {
+  let userId = req.app.locals.currentUserID;
+      try {
+      // Fetch data from "Hours" collection
+      const hours = await Hours.find({ userID: { $eq: userId } });
+      console.log(hours);
+      // Return data as JSON response
+      res.json(hours);
+      } catch (err) {
+      // Handle error
+      console.error(err);
+      res.status(500).send("Server error");
+      }
 });
 
 
