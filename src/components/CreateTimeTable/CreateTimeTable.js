@@ -70,10 +70,13 @@ const CreateTimeTable = () => {
     try {
       const response = await axios.post("http://localhost:4000/api/hours", data);
       console.log(response.data);
+      alert("Form submitted successfully!");
     } catch (error) {
+      alert("A timetable for this User Id and Week Id already exists, please check your input fields!");
       console.error(error);
     }
   };
+  
 
   return (
     <div>
@@ -162,6 +165,7 @@ const CreateTimeTable = () => {
 
 
     </div>
+    
   );
 };
 

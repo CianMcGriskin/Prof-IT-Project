@@ -105,6 +105,7 @@ app.get("/timetable", async (req, res) => {
   }
 });
 
+
 app.get("/timetable/:weekId", async (req, res) => {
   try {
     const weekId = req.params.weekId;
@@ -128,9 +129,15 @@ app.get("/timetable/:weekId", async (req, res) => {
 
 
 
+
+
 app.post('/api/hours', async (req, res) => {
   try {
     const { schedule, userID, weekID } = req.body;
+    const existingHours = await Hours.findOne({ userID, weekID });
+    if (existingHours) {
+      return res.status(400).json({ message: 'A timetable with the same week and user ID already exists. Please edit or delete the existing timetable.' });
+    }
     const hours = new Hours({
       schedule,
       userID,
@@ -143,6 +150,8 @@ app.post('/api/hours', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
+
 
 // Set up a registration API endpoint
 app.post("/register", async (req, res) => {
@@ -293,7 +302,26 @@ app.patch('/api/registerRequests/:id', async (req, res) => {
   }
 });
 
+app.get("/timetables", async (req, res) => {
+  try {
+    const timetables = await Hours.find();
+    res.send(timetables);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
 
+// Route to update a timetable
+app.put("/timetables/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const schedule = req.body.schedule;
+    const timetable = await Hours.findByIdAndUpdate(id, { schedule });
+    res.send(timetable);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
 
 // Start the server
 let port = 4000;
