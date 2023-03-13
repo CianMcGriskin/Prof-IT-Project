@@ -198,26 +198,25 @@ app.get('/api/userid', (req, res) => {
 
 
 app.get('/api/usertype', (req, res) => {
-  let email = req.cookies.Auth;
-  console.log(email)
-  Users.findOne({ Email: email }, (err, user) => {
+  const email = req.cookies.Auth;
+  Users.findOne({ email }, (err, user) => {
     if (err) {
       res.status(500).send('Error retrieving user ID');
     } else {
       const userId = user.userID;
-      console.log(userId);
-      UserInfo.findOne({ UserID: userId }, (err, userInfo) => {
+      UserInfo.findOne({ userID: userId }, (err, userInfo) => {
         if (err) {
           console.log(err);
           res.status(500).send('Error retrieving user information');
         } else {
-          const userType = user.userType;  
+          const userType = userInfo.userType;
           res.json(userType);
         }
       });
     }
   });
 });
+
 
 
 // GET all register requests
