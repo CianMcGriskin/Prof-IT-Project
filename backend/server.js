@@ -302,24 +302,23 @@ app.patch('/api/registerRequests/:id', async (req, res) => {
   }
 });
 
-app.get("/timetables", async (req, res) => {
+// Get all timetables
+app.get('/timetables', async (req, res) => {
   try {
     const timetables = await Hours.find();
-    res.send(timetables);
+    res.json(timetables);
   } catch (error) {
-    res.status(500).send(error);
+    res.status(500).json({ message: 'Error fetching timetables', error });
   }
 });
 
-// Route to update a timetable
-app.put("/timetables/:id", async (req, res) => {
+// Update an existing timetable
+app.put('/timetables/:id', async (req, res) => {
   try {
-    const id = req.params.id;
-    const schedule = req.body.schedule;
-    const timetable = await Hours.findByIdAndUpdate(id, { schedule });
-    res.send(timetable);
+    const updatedTimetable = await Hours.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.json(updatedTimetable);
   } catch (error) {
-    res.status(500).send(error);
+    res.status(400).json({ message: 'Error updating timetable', error });
   }
 });
 

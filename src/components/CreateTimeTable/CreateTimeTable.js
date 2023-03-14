@@ -8,13 +8,13 @@ const CreateTimeTable = () => {
   const [userid, setUserid] = useState("");
   const [weekid, setWeekid] = useState("");
   const [timetable, setTimetable] = useState({
-    Sunday: { startTime: "", endTime: "", totalHours: 0 },
-    Monday: { startTime: "", endTime: "", totalHours: 0 },
-    Tuesday: { startTime: "", endTime: "", totalHours: 0 },
-    Wednesday: { startTime: "", endTime: "", totalHours: 0 },
-    Thursday: { startTime: "", endTime: "", totalHours: 0 },
-    Friday: { startTime: "", endTime: "", totalHours: 0 },
-    Saturday: { startTime: "", endTime: "", totalHours: 0 }
+    Sunday: { startTime: "", endTime: "", totalHours: 0 , hasDayOff: false},
+    Monday: { startTime: "", endTime: "", totalHours: 0, hasDayOff: false },
+    Tuesday: { startTime: "", endTime: "", totalHours: 0, hasDayOff: false },
+    Wednesday: { startTime: "", endTime: "", totalHours: 0, hasDayOff: false },
+    Thursday: { startTime: "", endTime: "", totalHours: 0, hasDayOff: false },
+    Friday: { startTime: "", endTime: "", totalHours: 0 , hasDayOff: false},
+    Saturday: { startTime: "", endTime: "", totalHours: 0, hasDayOff: false }
   });
 
   const handleChange = (e) => {
@@ -26,19 +26,36 @@ const CreateTimeTable = () => {
       [day]: {
         ...timetable[day],
         [field]: value,
-        totalHours: calculateTotalHours(day, value, timetable[day].endTime)
-      }
+        totalHours: calculateTotalHours(day, value, timetable[day].endTime, timetable[day].hasDayOff),
+      },
     };
     setTimetable(newTimetable);
   };
 
-  const calculateTotalHours = (day, startTime, endTime) => {
+  const handleHoliday = (day) => {
+    const newTimetable = {
+      ...timetable,
+      [day]: {
+        ...timetable[day],
+        startTime: "00:00",
+        endTime: "00:00",
+        totalHours: 0,
+        hasDayOff: true,
+      },
+    };
+    setTimetable(newTimetable);
+  };
+
+  const calculateTotalHours = (day, startTime, endTime, hasDayOff) => {
+    if (hasDayOff) return 0;
     if (!startTime || !endTime) return 0;
     const start = new Date(`2001-01-01T${startTime}:00`);
     const end = new Date(`2001-01-01T${endTime}:00`);
     const diff = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
     return diff > 0 ? diff : diff + 24;
   };
+  
+
 
   const [userInfo, setUserInfo] = useState([]);
 
@@ -97,6 +114,9 @@ const CreateTimeTable = () => {
           <label htmlFor="Sunday.endTime">Sunday end time:</label>
           <input type="time" name="Sunday.endTime" value={timetable.Sunday.endTime} onChange={handleChange} str="required" />
           <span>Total hours: {timetable.Sunday.totalHours.toFixed(2)}</span>
+          <button type="button" onClick={() => handleHoliday("Sunday")}>
+              Holiday
+            </button>
         </div>
         <div>
           <label htmlFor="Monday.startTime">Monday start time:</label>
@@ -104,6 +124,9 @@ const CreateTimeTable = () => {
           <label htmlFor="Monday.endTime">Monday end time:</label>
           <input type="time" name="Monday.endTime" value={timetable.Monday.endTime} onChange={handleChange} str="required" />
           <span>Total hours: {timetable.Monday.totalHours.toFixed(2)}</span>
+          <button type="button" onClick={() => handleHoliday("Monday")}>
+              Holiday
+            </button>
         </div>
         <div>
           <label htmlFor="Tuesday.startTime">Tuesday start time:</label>
@@ -111,6 +134,9 @@ const CreateTimeTable = () => {
           <label htmlFor="Tuesday.endTime">Tuesday end time:</label>
           <input type="time" name="Tuesday.endTime" value={timetable.Tuesday.endTime} onChange={handleChange} str="required" />
           <span>Total hours: {timetable.Tuesday.totalHours.toFixed(2)}</span>
+          <button type="button" onClick={() => handleHoliday("Tuesday")}>
+              Holiday
+            </button>
         </div>
         <div>
           <label htmlFor="Wednesday.startTime">Wednesday start time:</label>
@@ -118,6 +144,9 @@ const CreateTimeTable = () => {
           <label htmlFor="Wednesday.endTime">Wednesday end time:</label>
           <input type="time" name="Wednesday.endTime" value={timetable.Wednesday.endTime} onChange={handleChange} str="required" />
           <span>Total hours: {timetable.Wednesday.totalHours.toFixed(2)}</span>
+          <button type="button" onClick={() => handleHoliday("Wednesday")}>
+              Holiday
+            </button>
         </div>
         <div>
           <label htmlFor="Thursday.startTime">Thursday start time:</label>
@@ -125,6 +154,9 @@ const CreateTimeTable = () => {
           <label htmlFor="Thursday.endTime">Thursday end time:</label>
           <input type="time" name="Thursday.endTime" value={timetable.Thursday.endTime} onChange={handleChange} str="required" />
           <span>Total hours: {timetable.Thursday.totalHours.toFixed(2)}</span>
+          <button type="button" onClick={() => handleHoliday("Thursday")}>
+              Holiday
+            </button>
         </div>
         <div>
           <label htmlFor="Friday.startTime">Friday start time:</label>
@@ -132,6 +164,9 @@ const CreateTimeTable = () => {
           <label htmlFor="Friday.endTime">Friday end time:</label>
           <input type="time" name="Friday.endTime" value={timetable.Friday.endTime} onChange={handleChange} str="required" />
           <span>Total hours: {timetable.Friday.totalHours.toFixed(2)}</span>
+          <button type="button" onClick={() => handleHoliday("Friday")}>
+              Holiday
+            </button>
         </div>
         <div>
           <label htmlFor="Saturday.startTime">Saturday start time:</label>
@@ -139,6 +174,9 @@ const CreateTimeTable = () => {
           <label htmlFor="Saturday.endTime">Saturday end time:</label>
           <input type="time" name="Saturday.endTime" value={timetable.Saturday.endTime} onChange={handleChange} str="required" />
           <span>Total hours: {timetable.Saturday.totalHours.toFixed(2)}</span>
+          <button type="button" onClick={() => handleHoliday("Saturday")}>
+              Holiday
+            </button>
         </div>
         <button type="submit">Submit</button>
       </form>
