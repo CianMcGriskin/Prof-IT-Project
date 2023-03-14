@@ -253,6 +253,7 @@ app.get('/api/usertype', (req, res) => {
           res.status(500).send('Error retrieving user information');
         } else {
           const userType = userInfo.userType;
+          app.locals.currentUserType = userType;
           res.json(userType);
         }
       });
@@ -262,12 +263,16 @@ app.get('/api/usertype', (req, res) => {
 
 app.get("/timetable", async (req, res) => {
   let userId = req.app.locals.currentUserID;
+  let userType = req.app.locals.currentUserType;
+  console.log(userType);
       try {
-      // Fetch data from "Hours" collection
-      const hours = await Hours.find({ userID: { $eq: userId } });
-      console.log(hours);
-      // Return data as JSON response
-      res.json(hours);
+        if(userType != "Manager"){
+          const hoursManager = await Hours.find({ userID: { $eq: userId } });
+          res.json(hoursManager);
+        } else {
+          const hoursEmployee = await Hours.find();
+          res.json(hoursEmployee);
+        }
       } catch (err) {
       // Handle error
       console.error(err);
@@ -275,7 +280,34 @@ app.get("/timetable", async (req, res) => {
       }
 });
 
-
+app.get('/manager-timetable', async (req, res) => {
+  try {
+    // Retrieve the data by joining the UserInfo and Hours collections based on the userID field
+    const data = await UserInfo.aggregate([
+      {
+        $lookup: {
+          from: 'Hours',
+          localField: 'userID',
+          foreignField: 'userID',
+          as: 'hours'
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          firstName: 1,
+          lastName: 1,
+          'hours.schedule': 1,
+          'hours.weekID': 1
+        }
+      }
+    ]);
+    res.json(data);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 
 // GET all register requests
 app.get('/api/registerRequests', async (req, res) => {
