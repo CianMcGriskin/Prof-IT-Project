@@ -30,6 +30,7 @@ const CreateTimeTable = () => {
       }
     };
     setTimetable(newTimetable);
+    console.log(timetable);
   };
 
   const calculateTotalHours = (day, startTime, endTime) => {

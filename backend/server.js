@@ -145,6 +145,7 @@ app.post('/api/hours', async (req, res) => {
     });
     const savedHours = await hours.save();
     res.json(savedHours);
+    console.log(savedHours);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Internal server error' });
@@ -302,6 +303,7 @@ app.patch('/api/registerRequests/:id', async (req, res) => {
   }
 });
 
+// Route to fetch all timetables
 app.get("/timetables", async (req, res) => {
   try {
     const timetables = await Hours.find();
@@ -312,16 +314,29 @@ app.get("/timetables", async (req, res) => {
 });
 
 // Route to update a timetable
-app.put("/timetables/:id", async (req, res) => {
+// Define PUT endpoint to update timetables
+app.put("/timetable/:userID/:weekID", async (req, res) => {
+  const userID = req.params.userID;
+  const weekID = req.params.weekID;
+  const newSchedule = req.body.schedule;
+
   try {
-    const id = req.params.id;
-    const schedule = req.body.schedule;
-    const timetable = await Hours.findByIdAndUpdate(id, { schedule });
-    res.send(timetable);
-  } catch (error) {
-    res.status(500).send(error);
+    // Find the existing timetable for the user and week
+    const existingHours = await Hours.findOne({ userID, weekID });
+
+    // Update the timetable with the new schedule
+    existingHours.schedule = newSchedule;
+
+    // Save the updated timetable to the database
+    await existingHours.save();
+
+    res.status(200).send("Timetable updated successfully");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Internal server error");
   }
 });
+
 
 // Start the server
 let port = 4000;
