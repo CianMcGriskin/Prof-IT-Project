@@ -12,7 +12,6 @@ app.use(cookieParser());
 
 
 
-
 // Connect to MongoDB database
 mongoose.connect(
   "mongodb+srv://batman:root@cluster0.tjfhrts.mongodb.net/Rosterota?retryWrites=true&w=majority",{
@@ -93,42 +92,21 @@ app.post("/", (req, res) => {
   });
 });
 
-
-
-//Only display based on User ID - get user id and only display content of timetable with that user id
-app.get("/timetable/:weekId", async (req, res) => {
-  const email = req.cookies.Auth;
-  console.log(userId);
-  Users.findOne({ email }, async (err, user) => {
-    if (err) {
-      console.error(err);
-      res.status(500).send("Server error");
-    } else {
-      const userId = user.userID;
-      console.log(userId);
-      try {
-        const weekId = req.params.weekId;
-        // Fetch data from "Hours" collection for the specified week and user
-        const timetable = await Hours.find({ weekID: {$eq: weekId}, userID: {$eq: userId} });
-        if (timetable.length === 0) {
-          // Return 404 status code if timetable for the specified week is not found
-          res.status(404).send("Timetable not found for the specified week");
-        } else {
-          // Set the response header to "application/json"
-          res.setHeader("Content-Type", "application/json");
-          // Return data as JSON response
-          res.json(timetable);
-        }
-      } catch (err) {
-        // Handle error
-        console.error(err);
-        res.status(500).send("Server error");
-      }
-    }
-  });
+app.get("/timetable", async (req, res) => {
+  try {
+    // Fetch data from "Hours" collection
+    const hours = await Hours.find();
+    // Return data as JSON response
+    res.json(hours);
+  } catch (err) {
+    // Handle error
+    console.error(err);
+    res.status(500).send("Server error");
+  }
 });
 
-app.put("/timetable/:weekId", async (req, res) => {
+
+app.get("/timetable/:weekId", async (req, res) => {
   try {
     const weekId = req.params.weekId;
     // Fetch data from "Hours" collection for the specified week
@@ -137,13 +115,9 @@ app.put("/timetable/:weekId", async (req, res) => {
       // Return 404 status code if timetable for the specified week is not found
       res.status(404).send("Timetable not found for the specified week");
     } else {
-      // Update the timetable data
-      timetable.data = req.body;
-      // Save the updated timetable to the database
-      await timetable.save();
       // Set the response header to "application/json"
-      res.setHeader("Content-Type", "application/json");
-      // Return the updated timetable as JSON response
+      res.setHeader("Content-Type", "application/js on");
+      // Return data as JSON response
       res.json(timetable);
     }
   } catch (err) {
@@ -153,9 +127,17 @@ app.put("/timetable/:weekId", async (req, res) => {
   }
 });
 
+
+
+
+
 app.post('/api/hours', async (req, res) => {
   try {
     const { schedule, userID, weekID } = req.body;
+    const existingHours = await Hours.findOne({ userID, weekID });
+    if (existingHours) {
+      return res.status(400).json({ message: 'A timetable with the same week and user ID already exists. Please edit or delete the existing timetable.' });
+    }
     const hours = new Hours({
       schedule,
       userID,
@@ -168,6 +150,8 @@ app.post('/api/hours', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
+
 
 // Set up a registration API endpoint
 app.post("/register", async (req, res) => {
@@ -246,7 +230,6 @@ app.get('/api/usertype', (req, res) => {
       res.status(500).send('Error retrieving user ID');
     } else {
       const userId = user.userID;
-      app.locals.currentUserID = userId;
       UserInfo.findOne({ userID: userId }, (err, userInfo) => {
         if (err) {
           console.log(err);
@@ -366,7 +349,26 @@ app.patch('/api/registerRequests/:id', async (req, res) => {
   }
 });
 
+app.get("/timetables", async (req, res) => {
+  try {
+    const timetables = await Hours.find();
+    res.send(timetables);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
 
+// Route to update a timetable
+app.put("/timetables/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const schedule = req.body.schedule;
+    const timetable = await Hours.findByIdAndUpdate(id, { schedule });
+    res.send(timetable);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
 
 // Start the server
 let port = 4000;

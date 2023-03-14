@@ -1,4 +1,3 @@
-
 import NavigationBar from '../Navbar/Navbar';
 import axios from 'axios';
 import React, { useState, useEffect } from "react";
@@ -71,10 +70,13 @@ const CreateTimeTable = () => {
     try {
       const response = await axios.post("http://localhost:4000/api/hours", data);
       console.log(response.data);
+      alert("Form submitted successfully!");
     } catch (error) {
+      alert("A timetable for this User Id and Week Id already exists, please check your input fields!");
       console.error(error);
     }
   };
+  
 
   return (
     <div>
@@ -146,9 +148,7 @@ const CreateTimeTable = () => {
       <th>User ID</th>
       <th>First Name</th>
       <th>Last Name</th>
-      <th>Phone Number</th>
       <th>User Type</th>
-      <th>Company ID</th>
     </tr>
   </thead>
   <tbody>
@@ -157,15 +157,15 @@ const CreateTimeTable = () => {
         <td>{user.userID}</td>
         <td>{user.firstName}</td>
         <td>{user.lastName}</td>
-        <td>{user.phoneNumber}</td>
         <td>{user.userType}</td>
-        <td>{user.companyID}</td>
       </tr>
     ))}
   </tbody>
 </table>
 
+
     </div>
+    
   );
 };
 
