@@ -145,6 +145,7 @@ app.post('/api/hours', async (req, res) => {
     });
     const savedHours = await hours.save();
     res.json(savedHours);
+    console.log(savedHours);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Internal server error' });
@@ -236,6 +237,7 @@ app.get('/api/usertype', (req, res) => {
           res.status(500).send('Error retrieving user information');
         } else {
           const userType = userInfo.userType;
+          app.locals.currentUserType = userType;
           res.json(userType);
         }
       });
@@ -243,7 +245,53 @@ app.get('/api/usertype', (req, res) => {
   });
 });
 
+app.get("/timetable", async (req, res) => {
+  let userId = req.app.locals.currentUserID;
+  let userType = req.app.locals.currentUserType;
+  console.log(userType);
+      try {
+        if(userType != "Manager"){
+          const hoursManager = await Hours.find({ userID: { $eq: userId } });
+          res.json(hoursManager);
+        } else {
+          const hoursEmployee = await Hours.find();
+          res.json(hoursEmployee);
+        }
+      } catch (err) {
+      // Handle error
+      console.error(err);
+      res.status(500).send("Server error");
+      }
+});
 
+app.get('/manager-timetable', async (req, res) => {
+  try {
+    // Retrieve the data by joining the UserInfo and Hours collections based on the userID field
+    const data = await UserInfo.aggregate([
+      {
+        $lookup: {
+          from: 'Hours',
+          localField: 'userID',
+          foreignField: 'userID',
+          as: 'hours'
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          firstName: 1,
+          lastName: 1,
+          'hours.schedule': 1,
+          'hours.weekID': 1
+        }
+      }
+    ]);
+    res.json(data);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 
 // GET all register requests
 app.get('/api/registerRequests', async (req, res) => {
@@ -302,6 +350,7 @@ app.patch('/api/registerRequests/:id', async (req, res) => {
   }
 });
 
+// Route to fetch all timetables
 // Get all timetables
 app.get('/timetables', async (req, res) => {
   try {
@@ -313,7 +362,12 @@ app.get('/timetables', async (req, res) => {
 });
 
 // Update an existing timetable
-app.put('/timetables/:id', async (req, res) => {
+// Define PUT endpoint to update timetables
+app.put('/timetable/:userID/:weekID', async (req, res) => {
+  const userID = req.params.userID;
+  const weekID = req.params.weekID;
+  const newSchedule = req.body.schedule;
+
   try {
     const updatedTimetable = await Hours.findByIdAndUpdate(req.params.id, req.body, { new: true });
     res.json(updatedTimetable);
@@ -321,6 +375,7 @@ app.put('/timetables/:id', async (req, res) => {
     res.status(400).json({ message: 'Error updating timetable', error });
   }
 });
+
 
 // Start the server
 let port = 4000;

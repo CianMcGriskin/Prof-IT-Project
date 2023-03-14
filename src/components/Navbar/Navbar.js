@@ -32,7 +32,8 @@ const authCookie = cookieMap.Auth;
         <Container>
           <Navbar.Brand>Grosterota</Navbar.Brand>
           <Nav className="me-auto">
-            <Nav.Link href="/timetable">Timetable</Nav.Link>
+            {!isManager && <Nav.Link href="/timetable">Timetable</Nav.Link>}
+            {isManager && <Nav.Link href="/timetable-manager">Timetable</Nav.Link>}
             {isManager && <Nav.Link href="CreateTimeTable">Create Timetable</Nav.Link>}
             {isManager && <Nav.Link href="RegisterReq">Register Requests</Nav.Link>}
             
