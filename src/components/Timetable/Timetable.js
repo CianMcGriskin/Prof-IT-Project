@@ -3,6 +3,8 @@ import axios from 'axios';
 import { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
 
+let timeFormat = "'en-US', { hour: 'numeric', minute: 'numeric', hour12: true }";
+
 const TimetablePage = () => {
   const [selectedWeek, setSelectedWeek] = useState('');
   const [scheduleData, setScheduleData] = useState([]);
@@ -17,6 +19,7 @@ const TimetablePage = () => {
       .get(`http://localhost:4000/timetable`)
       .then((response) => {
         setScheduleData(response.data);
+        console.log(response.data)
       })
       .catch((error) => {
         console.error(error);
