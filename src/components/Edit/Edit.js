@@ -2,8 +2,10 @@ import NavigationBar from "../Navbar/Navbar";
 import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import Cookies from 'js-cookie';
 
-const CreateTimeTable = () => {
+
+const Edit = () => {
   const [timetables, setTimetables] = useState([]);
   const [selectedTimetable, setSelectedTimetable] = useState(null);
 
@@ -18,7 +20,11 @@ const CreateTimeTable = () => {
     Friday: { startTime: "", endTime: "", totalHours: 0, hasDayOff: false },
     Saturday: { startTime: "", endTime: "", totalHours: 0, hasDayOff: false },
   });
-
+  
+  const hasAuthCookie = Cookies.get('Auth');
+  if (!hasAuthCookie) {
+    window.location.href = '/';
+  }
 
   const [userInfo, setUserInfo] = useState([]);
 
@@ -346,4 +352,4 @@ const CreateTimeTable = () => {
   );
 };
 
-export default CreateTimeTable;
+export default Edit;

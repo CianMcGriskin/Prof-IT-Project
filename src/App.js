@@ -6,6 +6,8 @@ import CreateTimeTable from './components/CreateTimeTable/CreateTimeTable';
 import RegisterReq from './components/RegisterReq/RegisterReq';
 import TimetablePageManager from './components/TimetableManager/TimetableManager'
 import Edit from './components/Edit/Edit';
+import TimeTableRequest from './components/TimeTableRequest/TimeTableRequest';
+import Approve from './components/TimeTableRequest/Approve';
 import logo from './logo.svg';
 import './App.css';
 import TimetablePage from './components/Timetable/Timetable';
@@ -21,6 +23,8 @@ function App() {
       <Route path="/RegisterReq" element={<RegisterReq></RegisterReq>} />
       <Route path="/timetable-manager" element={<TimetablePageManager></TimetablePageManager>} />
       <Route path="/Edit" element={<Edit></Edit>} />
+      <Route path="/TimeTableRequest" element={<TimeTableRequest></TimeTableRequest>} />
+      <Route path="/Approve" element={<Approve></Approve>} />
 
     </Routes>
   </BrowserRouter>

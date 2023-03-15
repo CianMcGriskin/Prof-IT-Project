@@ -16,7 +16,7 @@ const CreateTimeTable = () => {
     Friday: { startTime: "", endTime: "", totalHours: 0 , hasDayOff: false},
     Saturday: { startTime: "", endTime: "", totalHours: 0, hasDayOff: false }
   });
-
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     const day = name.split(".")[0];
@@ -99,6 +99,7 @@ const CreateTimeTable = () => {
   return (
     <div>
       < NavigationBar />
+      <div className='container'>
       <form onSubmit={handleSubmit}>
         <div>
           <label htmlFor="userid">User ID:</label>
@@ -204,7 +205,7 @@ const CreateTimeTable = () => {
 
 
     </div>
-    
+    </div>
   );
 };
 
