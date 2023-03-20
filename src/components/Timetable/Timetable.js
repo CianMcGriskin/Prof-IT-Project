@@ -61,7 +61,7 @@ const TimetablePage = () => {
         <button className="arrow" onClick={() => handleClick('right')}>&#62;</button>
       </div>
 
-      {weeks[selectedWeekIndex-1] && (
+      {weeks[selectedWeekIndex-1] && (  
         <div>
             {filteredData.map((schedule, index) => (
               <div key={index}>
