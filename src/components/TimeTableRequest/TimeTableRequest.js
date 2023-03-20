@@ -16,6 +16,7 @@ const RequestTimeTableModification = () => {
       try {
         const response = await axios.get("http://localhost:4000/timetables");
         setTimetables(response.data);
+        console.log(response.data);
       } catch (error) {
         console.error("Error fetching timetables", error);
       }
@@ -23,6 +24,15 @@ const RequestTimeTableModification = () => {
 
     fetchTimetables();
   }, []);
+
+  const calculateHoursDifference = (startTime, endTime) => {
+    const start = new Date(startTime);
+    const end = new Date(endTime);
+    const diff = end - start;
+    const hours = diff / (1000 * 60 * 60);
+    return hours;
+  };
+
 
   const handleSelectTimetable = (e) => {
     const timetableId = e.target.value;
@@ -41,35 +51,56 @@ const RequestTimeTableModification = () => {
     }
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    const dayName = name.split(".")[0];
-    const field = name.split(".")[1];
-  
-    const updatedDay = selectedTimetable.schedule.map((day) => {
-      if (day[0] === dayName) {
-        if (field === "startTime") {
-          return [day[0], `2001-01-01T${value}:00`, day[2], day[3]];
-        } else if (field === "endTime") {
-          return [day[0], day[1], `2001-01-01T${value}:00`, day[3]];
-        }
-      }
-      return day;
-    });
-  
-    // Update the selectedTimetable state instead of creating a new modifiedTimetable
-    setSelectedTimetable({
-      ...selectedTimetable,
-      schedule: updatedDay,
-    });
-  };
-  
+const handleChange = (e) => {
+  const { name, value } = e.target;
+  const dayName = name.split(".")[0];
+  const field = name.split(".")[1];
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    navigate("/Approve", { state: { modifiedTimetable: selectedTimetable } });
-  };
-  
+  const updatedDay = selectedTimetable.schedule.map((day) => {
+    if (day[0] === dayName) {
+      let startTime = day[1];
+      let endTime = day[2];
+
+      if (field === "startTime") {
+        startTime = `2001-01-01T${value}:00`;
+      } else if (field === "endTime") {
+        endTime = `2001-01-01T${value}:00`;
+      }
+
+      let totalHours = 0;
+
+      if (new Date(startTime) >= new Date(endTime)) {
+        // Add 24 hours to the end time if the start time is greater than or equal to the end time
+        const endTimeNextDay = new Date(endTime);
+        endTimeNextDay.setDate(endTimeNextDay.getDate() + 1);
+        totalHours = calculateHoursDifference(startTime, endTimeNextDay);
+      } else {
+        totalHours = calculateHoursDifference(startTime, endTime);
+      }
+
+      return [day[0], startTime, endTime, totalHours];
+    }
+    return day;
+  });
+
+  setSelectedTimetable({
+    ...selectedTimetable,
+    schedule: updatedDay,
+  });
+};
+
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    await axios.post("http://localhost:4000/modify-hours", selectedTimetable);
+    alert("Modification request submitted.");
+    navigate("/");
+  } catch (error) {
+    console.error("Error submitting modification request", error);
+  }
+};
+
 
   return (
     <>

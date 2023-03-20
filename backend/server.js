@@ -7,17 +7,17 @@ const app = express();
 
 // Set up body-parser and cors middleware
 app.use(bodyParser.json());
-app.use(cors({credentials: true, origin: 'http://localhost:3000'}));
+app.use(cors({ credentials: true, origin: 'http://localhost:3000' }));
 app.use(cookieParser());
 
 
 
 // Connect to MongoDB database
 mongoose.connect(
-  "mongodb+srv://batman:root@cluster0.tjfhrts.mongodb.net/Rosterota?retryWrites=true&w=majority",{
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  }
+  "mongodb+srv://batman:root@cluster0.tjfhrts.mongodb.net/Rosterota?retryWrites=true&w=majority", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+}
 );
 
 // Schemas of the backend
@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema(
     userID: Number,
     status: { type: String, default: "Pending" },
   },
-  { collection: "Users" , versionKey: false}
+  { collection: "Users", versionKey: false }
 );
 
 // Define Mongoose schema
@@ -37,7 +37,16 @@ const hoursSchema = new mongoose.Schema({
   userID: Number,
   weekID: String,
 },
-{ collection: "Hours" , versionKey: false});
+  { collection: "Hours", versionKey: false });
+
+const UpdatehoursSchema = new mongoose.Schema(
+  {
+    schedule: [mongoose.Schema.Types.Mixed],
+    userID: Number,
+    weekID: String,
+  },
+  { collection: "ModifyHours", versionKey: false }
+);
 
 const registerRequestSchema = new mongoose.Schema(
   {
@@ -45,7 +54,7 @@ const registerRequestSchema = new mongoose.Schema(
     status: { type: String, default: "Pending" },
     hourlyRate: Number,
   },
-{ collection: "RegisterRequests",versionKey: false }
+  { collection: "RegisterRequests", versionKey: false }
 );
 
 const userInfoSchema = new mongoose.Schema({
@@ -55,13 +64,14 @@ const userInfoSchema = new mongoose.Schema({
   userType: String,
   companyID: Number,
   userID: Number,
-}, { collection: "UserInfo" , versionKey: false});
+}, { collection: "UserInfo", versionKey: false });
 
 
 const Users = mongoose.model("User", userSchema);
 const Hours = mongoose.model("Hours", hoursSchema);
 const RegisterRequests = mongoose.model("RegisterRequests", registerRequestSchema);
 const UserInfo = mongoose.model("UserInfo", userInfoSchema);
+const ModifyHours = mongoose.model("ModifyHours", UpdatehoursSchema);
 
 
 // Set up a login API endpoint
@@ -352,6 +362,43 @@ app.put('/timetables/:id', async (req, res) => {
     res.status(400).json({ message: 'Error updating timetable', error });
   }
 });
+
+app.post("/modify-hours", async (req, res) => {
+  try {
+    const { userID, ...modifiedTimetable } = req.body;
+    const modifyHours = new ModifyHours({ userID, timetable: modifiedTimetable });
+    console.log(userID);
+    await modifyHours.save();
+    res.status(201).send(modifyHours);
+  } catch (error) {
+    res.status(400).send({ error: "Error submitting modification request" });
+  }
+});
+
+// Fetch modification requests
+app.get("/modify-hours", async (req, res) => {
+  try {
+    const modifyHours = await ModifyHours.find();
+    res.send(modifyHours);
+  } catch (error) {
+    res.status(500).send({ error: "Error fetching modification requests" });
+  }
+});
+
+
+// Delete a modification request
+app.delete("/modify-hours/:id", async (req, res) => {
+  try {
+    const modifyHours = await ModifyHours.findByIdAndDelete(req.params.id);
+    if (!modifyHours) {
+      return res.status(404).send({ error: "Modification request not found" });
+    }
+    res.send(modifyHours);
+  } catch (error) {
+    res.status(500).send({ error: "Error deleting modification request" });
+  }
+});
+
 
 // Start the server
 let port = 4000;

@@ -1,28 +1,48 @@
-import React from 'react';
-import { useLocation } from 'react-router-dom';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+
+import axios from "axios";
+
 
 const AdminApproval = () => {
-  const location = useLocation();
-  const modifiedTimetable = location.state?.modifiedTimetable;
+  const [requests, setRequests] = useState([]);
 
-  const handleApproval = async (isApproved) => {
-    if (isApproved) {
+  useEffect(() => {
+    const fetchRequests = async () => {
       try {
-        await axios.put(`http://localhost:4000/timetables/${modifiedTimetable._id}`, modifiedTimetable);
-        alert('Timetable update approved and saved.');
+        const response = await axios.get("http://localhost:4000/modify-hours");
+        setRequests(response.data);
       } catch (error) {
-        console.error('Error updating timetable', error);
+        console.error("Error fetching modification requests", error);
       }
-    } else {
-      alert('Timetable update denied.');
+    };
+
+    fetchRequests();
+  }, []);
+
+  const handleApproval = async (isApproved, index) => {
+    const modifiedTimetable = requests[index];
+  
+    try {
+      if (isApproved) {
+        await axios.put(`http://localhost:4000/timetables/${modifiedTimetable._id}`, modifiedTimetable);
+        alert("Timetable update approved and saved.");
+      } else {
+        alert("Timetable update denied.");
+      }
+  
+      // Delete the request from the ModifyHours collection
+      await axios.delete(`http://localhost:4000/modify-hours/${modifiedTimetable._id}`);
+      setRequests(requests.filter((_, i) => i !== index));
+    } catch (error) {
+      console.error("Error handling approval", error);
     }
   };
+  
 
   return (
     <>
-      {modifiedTimetable && (
-        <>
+      {requests.map((modifiedTimetable, index) => (
+        <div key={index}>
           <h1>Modified Timetable</h1>
           <table>
             <thead>
@@ -34,8 +54,8 @@ const AdminApproval = () => {
               </tr>
             </thead>
             <tbody>
-              {modifiedTimetable.schedule.map((day, index) => (
-                <tr key={index}>
+              {modifiedTimetable.schedule.map((day, i) => (
+                <tr key={i}>
                   <td>{day[0]}</td>
                   <td>{day[1].slice(11, 16)}</td>
                   <td>{day[2].slice(11, 16)}</td>
@@ -44,10 +64,10 @@ const AdminApproval = () => {
               ))}
             </tbody>
           </table>
-        </>
-      )}
-      <button onClick={() => handleApproval(true)}>Approve</button>
-      <button onClick={() => handleApproval(false)}>Deny</button>
+          <button onClick={() => handleApproval(true, index)}>Approve</button>
+          <button onClick={() => handleApproval(false, index)}>Deny</button>
+        </div>
+      ))}
     </>
   );
 };
