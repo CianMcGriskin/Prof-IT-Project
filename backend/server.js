@@ -297,7 +297,6 @@ app.get('/api/userinfo', async (req, res) => {
 });
 
 
-
 app.patch('/api/registerRequests/:id', async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
@@ -351,6 +350,25 @@ app.put('/timetables/:id', async (req, res) => {
   } catch (error) {
     res.status(400).json({ message: 'Error updating timetable', error });
   }
+});
+
+app.post('/api/copy-timetable', async (req, res) => {
+  const { fromWeek, toWeek, selectedUser} = req.body;
+  // console.log(fromWeek.value);
+  const fromHours = await Hours.findOne({ weekID: fromWeek.value, userID: selectedUser.value}).exec();
+  if (!fromHours) {
+    console.log("Error");
+  }
+
+  const toHours = new Hours({
+    schedule: fromHours.schedule,
+    userID: selectedUser.value,
+    weekID: toWeek.value,
+  });
+
+  await toHours.save();
+
+  res.sendStatus(200);
 });
 
 // Start the server

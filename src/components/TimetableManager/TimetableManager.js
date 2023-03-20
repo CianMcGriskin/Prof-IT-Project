@@ -91,27 +91,11 @@ return (
             )
           );
         })}
-
-        {/* {userData.map(({ firstName, lastName, hours }) => (
-            console.log(hours),
-            <tr key={`${firstName}-${lastName}`}>
-            <td>{`${firstName} ${lastName}`}</td>
-            {hours && hours.length > 0 && (
-              <>
-                <td>{formatTime(hours[0].schedule[0][1])}</td>
-                <td>{new Date(hours[0].schedule[0][1]).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })} - {new Date(hours[0].schedule[0][2]).toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })}</td>
-                <td>{new Date(hours[0].schedule[1][1]).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })} - {new Date(hours[0].schedule[0][2]).toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })}</td>
-                <td>{new Date(hours[0].schedule[2][1]).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })} - {new Date(hours[0].schedule[0][2]).toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })}</td>
-                <td>{new Date(hours[0].schedule[3][1]).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })} - {new Date(hours[0].schedule[0][2]).toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })}</td>
-                <td>{new Date(hours[0].schedule[4][1]).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })} - {new Date(hours[0].schedule[0][2]).toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })}</td>
-                <td>{new Date(hours[0].schedule[5][1]).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })} - {new Date(hours[0].schedule[0][2]).toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })}</td>
-              </>
-              
-            )}
-            </tr>
-        ))} */}
         </tbody>
       </table>
+      <center>
+        <button onClick={() => {window.location.href='/copytimetable'}}>Copy Timetable</button>
+      </center>
     </div>
   );
 };

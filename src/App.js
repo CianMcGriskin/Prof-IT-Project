@@ -11,6 +11,7 @@ import Approve from './components/TimeTableRequest/Approve';
 import logo from './logo.svg';
 import './App.css';
 import TimetablePage from './components/Timetable/Timetable';
+import CopyTimetablePage from './components/CopyTimetable/CopyTimetableComponent';
 
 function App() {
   return (
@@ -25,7 +26,7 @@ function App() {
       <Route path="/Edit" element={<Edit></Edit>} />
       <Route path="/TimeTableRequest" element={<TimeTableRequest></TimeTableRequest>} />
       <Route path="/Approve" element={<Approve></Approve>} />
-
+      <Route path="/CopyTimetable" element={<CopyTimetablePage></CopyTimetablePage>} />
     </Routes>
   </BrowserRouter>
   );
