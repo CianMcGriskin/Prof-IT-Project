@@ -1,0 +1,73 @@
+.scroller {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100px;
+    margin: 20px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .arrow {
+    font-size: 24px;
+    font-weight: bold;
+    color: #aaa;
+    background-color: transparent;
+    border: none;
+    outline: none;
+    cursor: pointer;
+  }
+  
+  .arrow:hover {
+    color: #333;
+  }
+  
+  .week {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: #aaa;
+    width: 50px;
+    height: 50px;
+  }
+  
+  .selected {
+    color: #333;
+    background-color: #f5f5f5;
+    border-radius: 50%;
+  }
+  
+  .gray {
+    color: #ccc;
+  }
+  
+  .left {
+    margin-right: 10px;
+  }
+  
+  .right {
+    margin-left: 10px;
+  }
+  
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+  
+  th, td {
+    text-align: left;
+    padding: 0.5rem;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  th {
+    background-color: #f2f2f2;
+  }
+  
+  tr:hover {
+    background-color: #f5f5f5;
+  }
+  

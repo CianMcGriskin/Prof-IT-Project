@@ -11,7 +11,6 @@ function NavigationBar(){
   useEffect(() => {
     axios.get(`http://localhost:4000/api/usertype`, {withCredentials: true}).then((response) => {
       const userData = response.data;
-      console.log(userData);
       if (userData === 'Manager') {
         setIsManager(true);
       }

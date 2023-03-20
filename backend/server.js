@@ -127,6 +127,35 @@ app.get("/timetable/:weekId", async (req, res) => {
   }
 });
 
+app.get('/manager-timetable', async (req, res) => {
+  try {
+    // Retrieve the data by joining the UserInfo and Hours collections based on the userID field
+    const data = await UserInfo.aggregate([
+      {
+        $lookup: {
+          from: 'Hours',
+          localField: 'userID',
+          foreignField: 'userID',
+          as: 'hours'
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          firstName: 1,
+          lastName: 1,
+          'hours.schedule': 1,
+          'hours.weekID': 1
+        }
+      }
+    ]);
+    res.json(data);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 
 
 
