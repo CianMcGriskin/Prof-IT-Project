@@ -1,4 +1,6 @@
-/* Apply some basic styles to the page */
+/*
+*/
+/*
 * {
     box-sizing: border-box;
     font-family: Arial, sans-serif;
@@ -10,7 +12,7 @@
     padding: 0;
   }
   
-  /* Style the NavigationBar component */
+  /* Style the NavigationBar component
   .NavigationBar {
     background-color: #333;
     color: #fff;
@@ -24,7 +26,7 @@
     margin: 0;
   }
   
-  /* Style the form */
+  /* Style the form
   form {
     margin: 20px;
     padding: 20px;
@@ -64,7 +66,7 @@
     background-color: #444;
   }
   
-  /* Style the table */
+  /* Style the table
   table {
     margin: 20px;
     border-collapse: collapse;
@@ -82,7 +84,7 @@
     background-color: #f2f2f2;
   }
 
-  button {
+  /*button {
     padding: 10px;
     background-color: #4CAF50;
     color: #fff;
@@ -94,5 +96,4 @@
   
   button:hover {
     background-color: #3e8e41;
-  }
-  
+  }*/

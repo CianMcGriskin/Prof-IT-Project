@@ -39,7 +39,7 @@ const hoursSchema = new mongoose.Schema({
 },
   { collection: "Hours", versionKey: false });
 
-const UpdatehoursSchema = new mongoose.Schema(
+const ModifyHoursSchema = new mongoose.Schema(
   {
     schedule: [mongoose.Schema.Types.Mixed],
     userID: Number,
@@ -71,7 +71,7 @@ const Users = mongoose.model("User", userSchema);
 const Hours = mongoose.model("Hours", hoursSchema);
 const RegisterRequests = mongoose.model("RegisterRequests", registerRequestSchema);
 const UserInfo = mongoose.model("UserInfo", userInfoSchema);
-const ModifyHours = mongoose.model("ModifyHours", UpdatehoursSchema);
+const ModifyHours = mongoose.model("ModifyHours", ModifyHoursSchema);
 
 
 // Set up a login API endpoint
@@ -362,27 +362,42 @@ app.put('/timetables/:id', async (req, res) => {
   }
 });
 
+//Get modified timetable
 app.post("/modify-hours", async (req, res) => {
   try {
-    const { userID, ...modifiedTimetable } = req.body;
-    const modifyHours = new ModifyHours({ userID, timetable: modifiedTimetable });
-    console.log(userID);
+    const { schedule, userID, weekID, totalHours } = req.body;
+    const modifyHours = new ModifyHours({
+      schedule,
+      userID,
+      weekID,
+      totalHours,
+    });
+
     await modifyHours.save();
-    res.status(201).send(modifyHours);
+    res.status(201).json(modifyHours);
   } catch (error) {
-    res.status(400).send({ error: "Error submitting modification request" });
+    res.status(500).json({ message: "Error saving modified hours", error });
   }
 });
+
 
 // Fetch modification requests
 app.get("/modify-hours", async (req, res) => {
   try {
-    const modifyHours = await ModifyHours.find();
-    res.send(modifyHours);
+    const modifyHours = await ModifyHours.find().lean();
+    const modifyHoursWithUserInfo = [];
+
+    for (const modifyHour of modifyHours) {
+      const userInfo = await UserInfo.findOne({ userID: modifyHour.userID }).lean();
+      modifyHoursWithUserInfo.push({ ...modifyHour, userInfo });
+    }
+
+    res.send(modifyHoursWithUserInfo);
   } catch (error) {
     res.status(500).send({ error: "Error fetching modification requests" });
   }
 });
+
 
 
 // Delete a modification request
@@ -397,6 +412,7 @@ app.delete("/modify-hours/:id", async (req, res) => {
     res.status(500).send({ error: "Error deleting modification request" });
   }
 });
+
 
 
 app.post('/api/copy-timetable', async (req, res) => {

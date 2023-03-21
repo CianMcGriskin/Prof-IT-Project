@@ -41,7 +41,7 @@ function NavigationBar(){
               
             )}
             {isManager && <Nav.Link href="/RegisterReq">Register Requests</Nav.Link>}
-            {!isManager && <Nav.Link href="/TimeTableRequest">Timetable Requests</Nav.Link>}
+            {isManager && <Nav.Link href="/TimeTableRequest">Timetable Requests</Nav.Link>}
             <Nav.Link as={LogoutComponent}>Logout</Nav.Link>
           </Nav>
         </Container>
