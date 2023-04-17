@@ -29,7 +29,7 @@ const TimetablePageManager = () => {
         setSelectedWeek(event.target.value);
       };
 
-      function getCurrentWeekID() {
+    function getCurrentWeekID() {
         const today = new Date();
         const firstDayOfYear = new Date(today.getFullYear(), 0, 1);
         const pastDaysOfYear = (today - firstDayOfYear) / 86400000;
@@ -37,20 +37,19 @@ const TimetablePageManager = () => {
         return currentWeekNumber;
       }
 
-    function handleClick(direction) {
-      setSelectedWeekIndex((prevIndex) => {
-        if (direction === 'left') {
-          return prevIndex > 0 ? prevIndex - 1 : prevIndex;
-        } else if (direction === 'right') {
-          return prevIndex < 51 ? prevIndex + 1 : prevIndex;
-        } else {
-          return prevIndex;
-        }
-      });
-    }
+      function handleClick(direction) {
+        setSelectedWeekIndex((prevIndex) => {
+          if (direction === 'left') {
+            return prevIndex > 1 ? prevIndex - 1 : 1; // Prevent index from going below 1
+          } else if (direction === 'right') {
+            return prevIndex < 51 ? prevIndex + 1 : prevIndex;
+          } else {
+            return prevIndex;
+          }
+        });
+      }
 
     const weeks = Array.from({ length: 52 }, (_, i) => i + 1);
-    const filteredData = userData.filter(schedule => schedule.weekID === weeks[selectedWeekIndex-1].toString());
 
 return (
     <div>
@@ -78,15 +77,25 @@ return (
         <tbody>
         {userData.map(({ firstName, lastName, hours }) => {
           const filteredHours = hours.filter(hour => hour.weekID === weeks[selectedWeekIndex-1].toString());
+          
           return (
             filteredHours.length > 0 && (
               <tr key={`${firstName}-${lastName}`}>
                 <td>{`${firstName} ${lastName}`}</td>
-                {filteredHours[0].schedule.map((data, index) => (
-                  <td key={index}>
-                    {new Date(data[1]).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })} - {new Date(data[2]).toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })}
+                
+                {filteredHours[0].schedule.map((data, index) => {
+                  console.log(data);
+                  const startTime = new Date(data[1]).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
+                  const endTime = new Date(data[2]).toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
+                  return (
+                    <td key={index}>
+                      
+                    {startTime === '12:00 AM' && endTime === '12:00 AM'
+                      ? 'Day Off'
+                      : `${startTime} - ${endTime}`}
                   </td>
-                ))}
+                  )
+                })}
               </tr>
             )
           );
