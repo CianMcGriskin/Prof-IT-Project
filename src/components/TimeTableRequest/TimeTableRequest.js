@@ -8,22 +8,42 @@ const RequestTimeTableModification = () => {
   const [selectedTimetable, setSelectedTimetable] = useState(null);
   const [selectedDays, setSelectedDays] = useState([]);
   const [totalHours, setTotalHours] = useState({});
+  const [userID, setUserID] = useState(null);
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchTimetables = async () => {
+    const fetchUserID = async () => {
       try {
-        const response = await axios.get("http://localhost:4000/timetables");
+        const response = await axios.get("http://localhost:4000/api/userid");
+        setUserID(response.data);
         console.log(response.data);
-        setTimetables(response.data);
       } catch (error) {
-        console.error("Error fetching timetables", error);
+        console.error("Error fetching user ID", error);
       }
     };
 
-    fetchTimetables();
+    fetchUserID();
   }, []);
+
+  useEffect(() => {
+    if (userID) {
+      const fetchTimetables = async () => {
+        try {
+          const response = await axios.get("http://localhost:4000/timetables");
+          const userTimetables = response.data.filter(
+            (tt) => tt.userID === userID
+          );
+          console.log(userTimetables);
+          setTimetables(userTimetables);
+        } catch (error) {
+          console.error("Error fetching timetables", error);
+        }
+      };
+
+      fetchTimetables();
+    }
+  }, [userID]);
 
   const handleSelectTimetable = (e) => {
     const timetableId = e.target.value;
@@ -103,8 +123,6 @@ const RequestTimeTableModification = () => {
     }
   };
   
-  
-
   return (
     <>
       <NavigationBar />

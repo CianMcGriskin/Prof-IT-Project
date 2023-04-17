@@ -1,0 +1,75 @@
+/* Style the form */
+#time-table-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+#time-table-form div {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+#time-table-form label {
+  font-weight: bold;
+  width: 140px;
+  text-align: right;
+  margin-right: 1rem;
+}
+
+#time-table-form input[type="time"],
+#time-table-form input[type="text"] {
+  width: 80px;
+}
+
+#time-table-form span {
+  margin-left: 1rem;
+}
+
+#time-table-form button {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  color: #333;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+  transition: all 0.3s ease-in-out;
+}
+
+#time-table-form button:hover {
+  background-color: #0077ff;
+  color: #fff;
+}
+
+#time-table-form button:active,
+#time-table-form button:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+#time-table-form table {
+  width: 100%;
+  margin-top: 2rem;
+  border-collapse: collapse;
+}
+
+#time-table-form th,
+#time-table-form td {
+  padding: 0.5rem;
+  text-align: center;
+  border: 1px solid #ccc;
+}
+
+#time-table-form th {
+  background-color: #0077ff;
+  color: #fff;
+}
+
+#time-table-form td:first-child {
+  font-weight: bold;
+}

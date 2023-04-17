@@ -29,7 +29,7 @@ function NavigationBar(){
     <>
       <Navbar bg="dark" variant="dark">
         <Container>
-          <Navbar.Brand>Grosterota</Navbar.Brand>
+          <Navbar.Brand>Rosterota</Navbar.Brand>
           <Nav className="me-auto">
             {!isManager && <Nav.Link href="/timetable">Timetable</Nav.Link>}
             {isManager && <Nav.Link href="/timetable-manager">Timetable</Nav.Link>}
