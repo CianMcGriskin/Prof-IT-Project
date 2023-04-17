@@ -2,6 +2,7 @@ import NavigationBar from '../Navbar/Navbar';
 import axios from 'axios';
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import './CreateTimetable.css';
 
 
 const CreateTimeTable = () => {
