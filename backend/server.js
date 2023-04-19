@@ -236,13 +236,6 @@ app.post("/register", async (req, res) => {
 });
 
 
-fetch('/api/userid', {
-  method: 'GET',
-  credentials: 'include',
-})
-  .then(response => response.json())
-  .then(data => console.log(data))
-  .catch(error => console.log(error));
 
 
 app.get('/api/userid', (req, res) => {
@@ -254,8 +247,8 @@ app.get('/api/userid', (req, res) => {
     return;
   }
 
-  console.log(email);
-  Users.findOne({ Email: email }, (err, user) => {
+ // console.log(email);
+  Users.findOne({ email: email }, (err, user) => {
     if (err) {
       console.log(err);
       res.status(500).json({ error: "Server error" });
