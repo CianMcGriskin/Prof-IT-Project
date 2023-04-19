@@ -4,17 +4,14 @@ import { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
 import './Timetable.css'
 
-let timeFormat = "'en-US', { hour: 'numeric', minute: 'numeric', hour12: true }";
-
 const TimetablePage = () => {
-  const [selectedWeek, setSelectedWeek] = useState('');
   const [scheduleData, setScheduleData] = useState([]);
   const [selectedWeekIndex, setSelectedWeekIndex] = useState(getCurrentWeekID());
 
   const hasAuthCookie = Cookies.get('Auth');
-  if (!hasAuthCookie) {
+  if (!hasAuthCookie) 
     window.location.href = '/';
-  }
+  
 
   useEffect(() => {
     axios
@@ -38,7 +35,7 @@ const TimetablePage = () => {
   function handleClick(direction) {
     setSelectedWeekIndex((prevIndex) => {
       if (direction === 'left') {
-        return prevIndex > 0 ? prevIndex - 1 : prevIndex;
+        return prevIndex > 1 ? prevIndex - 1 : 1; // Prevent index from going below 1
       } else if (direction === 'right') {
         return prevIndex < 51 ? prevIndex + 1 : prevIndex;
       } else {
@@ -48,7 +45,6 @@ const TimetablePage = () => {
   }
 
   const weeks = Array.from({ length: 52 }, (_, i) => i + 1);
-
   const filteredData = scheduleData.filter(schedule => schedule.weekID === weeks[selectedWeekIndex-1].toString());
   return (
     <div>
