@@ -15,7 +15,9 @@ const RequestTimeTableModification = () => {
   useEffect(() => {
     const fetchUserID = async () => {
       try {
-        const response = await axios.get("http://localhost:4000/api/userid");
+        const response = await axios.get("http://localhost:4000/api/userid", {
+          withCredentials: true,
+        });
         setUserID(response.data);
         console.log(response.data);
       } catch (error) {
@@ -30,7 +32,9 @@ const RequestTimeTableModification = () => {
     if (userID) {
       const fetchTimetables = async () => {
         try {
-          const response = await axios.get("http://localhost:4000/timetables");
+          const response = await axios.get("http://localhost:4000/timetables", {
+            withCredentials: true,
+          });
           const userTimetables = response.data.filter(
             (tt) => tt.userID === userID
           );
@@ -115,7 +119,9 @@ const RequestTimeTableModification = () => {
   
       console.log(modifiedHoursData);
   
-      await axios.post("http://localhost:4000/modify-hours", modifiedHoursData);
+      await axios.post("http://localhost:4000/modify-hours", modifiedHoursData, {
+        withCredentials: true,
+      });
       // Show success message or perform additional actions on successful save
     } catch (error) {
       console.error("Error saving modified hours", error);

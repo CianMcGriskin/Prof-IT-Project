@@ -235,15 +235,37 @@ app.post("/register", async (req, res) => {
   }
 });
 
+
+fetch('/api/userid', {
+  method: 'GET',
+  credentials: 'include',
+})
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch(error => console.log(error));
+
+
 app.get('/api/userid', (req, res) => {
   const email = req.cookies.Auth;
+
+  if (!email) {
+    console.log("Email cookie is undefined");
+    res.status(400).json({ error: "Email cookie not found" });
+    return;
+  }
+
+  console.log(email);
   Users.findOne({ Email: email }, (err, user) => {
-    if (err) 
+    if (err) {
       console.log(err);
-    else 
+      res.status(500).json({ error: "Server error" });
+    } else {
+      console.log(user.userID);
       res.json(user.userID);
+    }
   });
 });
+
 
 app.get('/api/usertype', (req, res) => {
   const email = req.cookies.Auth;
