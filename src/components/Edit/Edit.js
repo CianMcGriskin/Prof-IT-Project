@@ -337,6 +337,7 @@ const Edit = () => {
     </tr>
   </thead>
   <tbody>
+    {/*Print the user info at the bottom*/}
     {userInfo.map((user) => (
       <tr key={user.userID}>
         <td>{user.userID}</td>
