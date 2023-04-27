@@ -103,7 +103,6 @@ app.get("/timetable", async (req, res) => {
     // Return data as JSON response
     res.json(hours);
   } catch (err) {
-    // Handle error
     console.error(err);
     res.status(500).send("Server error");
   }
@@ -113,19 +112,15 @@ app.get("/timetable", async (req, res) => {
 app.get("/timetable/:weekId", async (req, res) => {
   try {
     const weekId = req.params.weekId;
-    // Fetch data from "Hours" collection for the specified week
+    // Fetch data for the specified week
     const timetable = await Hours.findOne({ weekID: weekId });
     if (!timetable) {
-      // Return 404 status code if timetable for the specified week is not found
       res.status(404).send("Timetable not found for the specified week");
     } else {
-      // Set the response header to "application/json"
       res.setHeader("Content-Type", "application/js on");
-      // Return data as JSON response
       res.json(timetable);
     }
   } catch (err) {
-    // Handle error
     console.error(err);
     res.status(500).send("Server error");
   }
@@ -160,6 +155,7 @@ app.get('/manager-timetable', async (req, res) => {
   }
 });
 
+//Create new timetable
 app.post('/api/hours', async (req, res) => {
   try {
     const { schedule, userID, weekID } = req.body;

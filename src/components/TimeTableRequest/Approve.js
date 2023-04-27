@@ -33,7 +33,7 @@ const AdminApproval = () => {
       // Find the corresponding day in the existing timetable
       const existingDay = timetable1.schedule.find((d) => d[0] === day2[0]);
 
-      // If the day doesn't exist in the existing timetable or the times are different
+      // If the day doesnt exist in the existing timetable or the times are different
       if (
         !existingDay ||
         existingDay[1] !== day2[1] ||
@@ -47,7 +47,6 @@ const AdminApproval = () => {
     return highlightedDays;
   };
 
-  // Function to handle approval of a timetable change request
   const handleApproval = async (isApproved, index) => {
     const { userInfo, ...modifiedTimetable } = requests[index]; // get the modified timetable data
 
@@ -113,8 +112,6 @@ const AdminApproval = () => {
       console.error("Error handling approval", error);
     }
   };
-
-  // Render the timetable change requests and highlight the differences between the modified timetable and the existing timetable
   return (
     <>
       <h1>Requested Timetable change</h1>
