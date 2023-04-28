@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import NavigationBar from '../Navbar/Navbar';
 import axios from "axios";
+import NavigationBar from "../Navbar/Navbar";
+
 
 const AdminApproval = () => {
   const [requests, setRequests] = useState([]); // array of timetable change requests
@@ -115,7 +117,7 @@ const AdminApproval = () => {
   };
   return (
     <>
-    <NavigationBar />
+      <NavigationBar />
       <h1>Requested Timetable change</h1>
       {requests.map((modifiedTimetable, index) => {
         // Find the corresponding existing timetable for the request based on weekid and userid
@@ -129,7 +131,9 @@ const AdminApproval = () => {
         );
   
         return (
+          <div>
           <div key={index}>
+            
             {modifiedTimetable.userInfo && (
               <h3>
                 Requester: {modifiedTimetable.userInfo.firstName} {modifiedTimetable.userInfo.lastName} Id:{modifiedTimetable.userInfo.userID} 
@@ -164,6 +168,7 @@ const AdminApproval = () => {
             </table>
             <button onClick={() => handleApproval(true, index)}>Approve</button>
             <button onClick={() => handleApproval(false, index)}>Deny</button>
+          </div>
           </div>
         );
       })}

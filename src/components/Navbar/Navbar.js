@@ -39,6 +39,13 @@ function NavigationBar(){
                 <NavDropdown.Item href="/edit">Edit Timetable</NavDropdown.Item> {/* add a new NavDropdown item */}
               </NavDropdown>
             )}
+                        {isManager && (
+              <NavDropdown title="Timetable Requests" id="timetable-dropdown">
+                <NavDropdown.Item href="/TimeTableRequest">Timetable Requests</NavDropdown.Item>
+                <NavDropdown.Item href="/approve">Approve timetable request</NavDropdown.Item> {/* add a new NavDropdown item */}
+              </NavDropdown>
+            )}
+            
             {isManager && <Nav.Link href="/RegisterReq">Register Requests</Nav.Link>}
             {!isManager && <Nav.Link href="/TimeTableRequest">Timetable Request</Nav.Link>}
             {isManager && <Nav.Link href="/approve">Timetable Requests</Nav.Link>}
