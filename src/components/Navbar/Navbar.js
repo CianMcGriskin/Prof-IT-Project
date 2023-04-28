@@ -38,10 +38,10 @@ function NavigationBar(){
                 <NavDropdown.Item href="/CreateTimeTable">Create Timetable</NavDropdown.Item>
                 <NavDropdown.Item href="/edit">Edit Timetable</NavDropdown.Item> {/* add a new NavDropdown item */}
               </NavDropdown>
-              
             )}
             {isManager && <Nav.Link href="/RegisterReq">Register Requests</Nav.Link>}
-            {<Nav.Link href="/TimeTableRequest">Timetable Requests</Nav.Link>}
+            {!isManager && <Nav.Link href="/TimeTableRequest">Timetable Request</Nav.Link>}
+            {isManager && <Nav.Link href="/approve">Timetable Requests</Nav.Link>}
             <Nav.Link as={LogoutComponent}>Logout</Nav.Link>
           </Nav>
         </Container>

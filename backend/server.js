@@ -91,7 +91,7 @@ app.post("/", async (req, res) => {
       if (user.password === password /* && user.status === "Accepted" */){
         res.cookie("UserAuth", "AuthTest", { httpOnly: false });
         res.status(200).send("success");
-      }
+      } 
       else if (user.password === password && user.status != "Accepted") 
         console.log("User not accepted in / post request");
       else 

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import NavigationBar from '../Navbar/Navbar';
 import axios from "axios";
 
 const AdminApproval = () => {
@@ -114,6 +115,7 @@ const AdminApproval = () => {
   };
   return (
     <>
+    <NavigationBar />
       <h1>Requested Timetable change</h1>
       {requests.map((modifiedTimetable, index) => {
         // Find the corresponding existing timetable for the request based on weekid and userid
