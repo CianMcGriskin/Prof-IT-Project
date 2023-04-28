@@ -20,7 +20,7 @@ mongoose.connect(
 }
 );
 
-// Schemas of the backend
+// Schemas of the backend - User collection Schema
 const userSchema = new mongoose.Schema(
   {
     email: String,
@@ -31,7 +31,7 @@ const userSchema = new mongoose.Schema(
   { collection: "Users", versionKey: false }
 );
 
-// Define Mongoose schema
+// Hours collection Schema
 const hoursSchema = new mongoose.Schema({
   schedule: [mongoose.Schema.Types.Mixed],
   userID: Number,
@@ -39,6 +39,7 @@ const hoursSchema = new mongoose.Schema({
 },
   { collection: "Hours", versionKey: false });
 
+// ModifyHours collection Schema
 const ModifyHoursSchema = new mongoose.Schema(
   {
     schedule: [mongoose.Schema.Types.Mixed],
@@ -48,6 +49,7 @@ const ModifyHoursSchema = new mongoose.Schema(
   { collection: "ModifyHours", versionKey: false }
 );
 
+// RegisterRequests collection Schema
 const registerRequestSchema = new mongoose.Schema(
   {
     UserID: Number,
@@ -57,6 +59,7 @@ const registerRequestSchema = new mongoose.Schema(
   { collection: "RegisterRequests", versionKey: false }
 );
 
+// UserInfo collection Schema
 const userInfoSchema = new mongoose.Schema({
   firstName: String,
   lastName: String,
@@ -66,7 +69,7 @@ const userInfoSchema = new mongoose.Schema({
   userID: Number,
 }, { collection: "UserInfo", versionKey: false });
 
-
+// Defining variables using the created schemas
 const Users = mongoose.model("User", userSchema);
 const Hours = mongoose.model("Hours", hoursSchema);
 const RegisterRequests = mongoose.model("RegisterRequests", registerRequestSchema);
@@ -74,34 +77,30 @@ const UserInfo = mongoose.model("UserInfo", userInfoSchema);
 const ModifyHours = mongoose.model("ModifyHours", ModifyHoursSchema);
 
 
-// Set up a login API endpoint
-app.post("/", (req, res) => {
+// Set up a login API to check the database for user login details
+app.post("/", async (req, res) => {
   const { email, password } = req.body;
-  // Check if email exists in the database
+  // Check if email exists in the database using the inputed data from the user
   Users.findOne({ email }, (err, user) => {
-    if (err) {
-      console.error(err);
-      res.status(500).send("Server error");
-    } else if (!user) {
-      res.status(400).send("Email not found");
-      console.log("Email not found");
-    } else {
+    if (err) 
+      console.log("Server Error Occured in / post request");
+    else if (!user) 
+    console.log("Email Not Found in / post request");
+    else {
       // Check if password matches
-      if (user.password === password /* && user.status === "Accepted" */) {
+      if (user.password === password /* && user.status === "Accepted" */){
         res.cookie("UserAuth", "AuthTest", { httpOnly: false });
         res.status(200).send("success");
-        console.log("Correct password and user is accepted");
-      } else if (user.password === password && user.status != "Accepted") {
-        res.status(400).send("User not accepted");
-        console.log("User not accepted");
-      } else {
-        res.status(400).send("Wrong password");
-        console.log("Wrong password");
       }
+      else if (user.password === password && user.status != "Accepted") 
+        console.log("User not accepted in / post request");
+      else 
+        console.log("Wrong password in / post request"); 
     }
   });
 });
 
+// Request to retrieve timetable information
 app.get("/timetable", async (req, res) => {
   try {
     // Fetch data from "Hours" collection
@@ -109,34 +108,29 @@ app.get("/timetable", async (req, res) => {
     // Return data as JSON response
     res.json(hours);
   } catch (err) {
-    // Handle error
-    console.error(err);
-    res.status(500).send("Server error");
+    console.log(err);
   }
 });
 
-
+// Request to retrieve timetable information from a particular timetable weekID
 app.get("/timetable/:weekId", async (req, res) => {
   try {
     const weekId = req.params.weekId;
     // Fetch data from "Hours" collection for the specified week
     const timetable = await Hours.findOne({ weekID: weekId });
-    if (!timetable) {
-      // Return 404 status code if timetable for the specified week is not found
-      res.status(404).send("Timetable not found for the specified week");
-    } else {
-      // Set the response header to "application/json"
+    if (!timetable) 
+      console.log("Timetable not found for the specified week");
+    else {
+      // Set the response header to json
       res.setHeader("Content-Type", "application/js on");
-      // Return data as JSON response
       res.json(timetable);
     }
   } catch (err) {
-    // Handle error
-    console.error(err);
-    res.status(500).send("Server error");
+    console.log(err);
   }
 });
 
+// Two different types of timetable display - this one retrieves all employees timetable information on a particualr week ID
 app.get('/manager-timetable', async (req, res) => {
   try {
     // Retrieve the data by joining the UserInfo and Hours collections based on the userID field
@@ -150,6 +144,7 @@ app.get('/manager-timetable', async (req, res) => {
         }
       },
       {
+        // 1 and 0 represents whether we need those particular values or not
         $project: {
           _id: 0,
           firstName: 1,
@@ -161,48 +156,35 @@ app.get('/manager-timetable', async (req, res) => {
     ]);
     res.json(data);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Server error' });
+    console.log(err);
   }
 });
 
-
-
-
-
+// Post request sent to /api/hours/ - this is used to create and send new data to the timetable for a user and week ID
 app.post('/api/hours', async (req, res) => {
   try {
     const { schedule, userID, weekID } = req.body;
+    //Check if user already has timetable data for the week selected
     const existingHours = await Hours.findOne({ userID, weekID });
-    if (existingHours) {
+    if (existingHours) 
       return res.status(400).json({ message: 'A timetable with the same week and user ID already exists. Please edit or delete the existing timetable.' });
-    }
+    
     const hours = new Hours({
       schedule,
       userID,
       weekID,
     });
+    //Save hours and respond with new hours as json format
     const savedHours = await hours.save();
     res.json(savedHours);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Internal server error' });
+    console.log(err);
   }
 });
 
-
-
-// Set up a registration API endpoint
+// Set up a registration API endpoint to allow users to register to the system
 app.post("/register", async (req, res) => {
-  const {
-    firstName,
-    surname,
-    email,
-    password,
-    phoneNumber,
-    companyID,
-  } = req.body;
-
+  const { firstName, surname, email, password, phoneNumber, companyID } = req.body;
   try {
     const { hourlyRate } = req.body;
     // Find the latest user ID in the RegisterRequests collection
@@ -219,6 +201,7 @@ app.post("/register", async (req, res) => {
       status: "Pending",
       hourlyRate: hourlyRate || 12.11,
     });
+
     const userInfo = new UserInfo({
       firstName,
       lastName: surname,
@@ -239,41 +222,41 @@ app.post("/register", async (req, res) => {
     await newRequest.save();
     await users.save();
 
-    res.status(200).send("success");
-    console.log(`New register request saved: ${JSON.stringify(newRequest)}`);
+    res.status(200).send("Success");
   } catch (err) {
-    // Handle error
-    console.error(err);
-    res.status(500).send("Server error");
+    console.log("Server error");
   }
 });
 
+// GET request used to find the userID of the current user logged in
 app.get('/api/userid', (req, res) => {
   const email = req.cookies.Auth;
-  Users.findOne({ Email: email }, (err, user) => {
-    if (err) {
-      console.log(err);
-      res.status(500).send('Error retrieving user ID');
-    } else {
+  if (!email) {
+    console.log("Email cookie is undefined");
+    return;
+  }
 
+  // Find userID based on email from cookie
+  Users.findOne({ email: email }, (err, user) => {
+    if (err) 
+      console.log(err);
+    else 
       res.json(user.userID);
-    }
   });
 });
 
-
+// GET user type (Employee/Manager) using cookie email
 app.get('/api/usertype', (req, res) => {
   const email = req.cookies.Auth;
   Users.findOne({ email }, (err, user) => {
-    if (err) {
-      res.status(500).send('Error retrieving user ID');
-    } else {
+    if (err) 
+      console.log('Error retrieving user ID');
+    else {
       const userId = user.userID;
       UserInfo.findOne({ userID: userId }, (err, userInfo) => {
-        if (err) {
+        if (err) 
           console.log(err);
-          res.status(500).send('Error retrieving user information');
-        } else {
+        else {
           const userType = userInfo.userType;
           res.json(userType);
         }
@@ -282,27 +265,23 @@ app.get('/api/usertype', (req, res) => {
   });
 });
 
-
-
 // GET all register requests
 app.get('/api/registerRequests', async (req, res) => {
   try {
     const requests = await RegisterRequests.find();
     res.json(requests);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.log(error);
   }
 });
 
-
-// GET all register requests
+// Get all userInfo
 app.get('/api/userinfo', async (req, res) => {
   try {
     const userInfo = await UserInfo.find({}, { _id: 0, __v: 0 });
     res.json(userInfo);
   } catch (error) {
     console.error(error);
-    res.status(500).send('Server error');
   }
 });
 
@@ -310,19 +289,17 @@ app.get('/api/userinfo', async (req, res) => {
 app.patch('/api/registerRequests/:id', async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
-
   try {
-    // Update register request
+    // Update Register Request
     const updatedRequest = await RegisterRequests.findByIdAndUpdate(
       id,
       { status },
       { new: true }
     );
 
-    if (!updatedRequest) {
+    if (!updatedRequest) 
       return res.status(404).json({ message: "Register request not found" });
-    }
-
+    
     // Update corresponding user
     const updatedUser = await Users.findOneAndUpdate(
       { userID: updatedRequest.UserID },
@@ -330,17 +307,16 @@ app.patch('/api/registerRequests/:id', async (req, res) => {
       { new: true }
     );
 
-    if (!updatedUser) {
+    if (!updatedUser) 
       return res.status(404).json({ message: "User not found" });
-    }
-
-    res.json({ updatedRequest, updatedUser });
+    
+     res.json({ updatedRequest, updatedUser });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 });
 
-// Get all timetables
+// Get all timetables and return the information
 app.get('/timetables', async (req, res) => {
   try {
     const timetables = await Hours.find();
@@ -350,9 +326,7 @@ app.get('/timetables', async (req, res) => {
   }
 });
 
-
-
-// Update an existing timetable
+// Update an existing timetable based on the ID of the user
 app.put('/timetables/:id', async (req, res) => {
   try {
     const updatedTimetable = await Hours.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -380,7 +354,6 @@ app.post("/modify-hours", async (req, res) => {
   }
 });
 
-
 // Fetch modification requests
 app.get("/modify-hours", async (req, res) => {
   try {
@@ -398,26 +371,21 @@ app.get("/modify-hours", async (req, res) => {
   }
 });
 
-
-
-// Delete a modification request
+// Delets the hours of a timetable based on user ID
 app.delete("/modify-hours/:id", async (req, res) => {
   try {
     const modifyHours = await ModifyHours.findByIdAndDelete(req.params.id);
-    if (!modifyHours) {
+    if (!modifyHours) 
       return res.status(404).send({ error: "Modification request not found" });
-    }
     res.send(modifyHours);
   } catch (error) {
     res.status(500).send({ error: "Error deleting modification request" });
   }
 });
 
-
-
+// API which copies timetable from one week to the next for a selected user
 app.post('/api/copy-timetable', async (req, res) => {
   const { fromWeek, toWeek, selectedUser} = req.body;
-  // console.log(fromWeek.value);
   const fromHours = await Hours.findOne({ weekID: fromWeek.value, userID: selectedUser.value}).exec();
   if (!fromHours) {
     console.log("Error");
@@ -430,7 +398,6 @@ app.post('/api/copy-timetable', async (req, res) => {
   });
 
   await toHours.save();
-
   res.sendStatus(200);
 });
 

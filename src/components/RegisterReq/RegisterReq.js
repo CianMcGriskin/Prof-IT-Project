@@ -6,6 +6,8 @@ import Cookies from 'js-cookie';
 const RegisterReq = () => {
   const [registerRequests, setRegisterRequests] = useState([]);
 
+
+  //Get data from registered users
   useEffect(() => {
     const fetchData = async () => {
       const response = await axios.get('http://localhost:4000/api/registerRequests');
@@ -13,13 +15,15 @@ const RegisterReq = () => {
     };
     fetchData();
   }, []);
-
+  //On approving change the status to 'Approved' allowing the user to log in 
   const handleApprove = async (id, userID) => {
     const response = await axios.patch(`http://localhost:4000/api/registerRequests/${id}`, {
       status: 'Approved'
     });
+    // 200 is a succesfull request
     if (response.status === 200) {
-      console.log("User ID:", userID);  
+      //console.log("User ID:", userID);  
+      //Map over the users and update the id
       const updatedRequests = registerRequests.map(req => {
         if (req._id === id) {
           return {

@@ -2,16 +2,15 @@ import NavigationBar from "../Navbar/Navbar";
 import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import Cookies from 'js-cookie';
-
+import Cookies from "js-cookie";
 
 const Edit = () => {
-  const [timetables, setTimetables] = useState([]);
+  const [timetables, setTimetables] = useState([]); //Store timetable to empty array
   const [selectedTimetable, setSelectedTimetable] = useState(null);
-
-  const [userid, setUserid] = useState("");
-  const [weekid, setWeekid] = useState("");
+  const [userid, setUserid] = useState(""); // Store userid
+  const [weekid, setWeekid] = useState(""); // Store weekid
   const [timetable, setTimetable] = useState({
+    // Set the timetaable with defualt values
     Sunday: { startTime: "", endTime: "", totalHours: 0, hasDayOff: false },
     Monday: { startTime: "", endTime: "", totalHours: 0, hasDayOff: false },
     Tuesday: { startTime: "", endTime: "", totalHours: 0, hasDayOff: false },
@@ -20,22 +19,24 @@ const Edit = () => {
     Friday: { startTime: "", endTime: "", totalHours: 0, hasDayOff: false },
     Saturday: { startTime: "", endTime: "", totalHours: 0, hasDayOff: false },
   });
-  
-  const hasAuthCookie = Cookies.get('Auth');
+
+  const hasAuthCookie = Cookies.get("Auth");
   if (!hasAuthCookie) {
-    window.location.href = '/';
+    window.location.href = "/";
   }
 
   const [userInfo, setUserInfo] = useState([]);
 
   const fetchUserInfo = async () => {
     try {
-      const response = await axios.get("http://localhost:4000/api/userinfo");
+      const response = await axios.get("http://localhost:4000/api/userinfo"); // Retrieve user info
       setUserInfo(response.data);
     } catch (error) {
       console.error(error);
     }
   };
+
+  // Function to create a holdiay (User worked 0 hours)
   const handleHoliday = (day) => {
     const newTimetable = {
       ...timetable,
@@ -47,9 +48,8 @@ const Edit = () => {
         hasDayOff: true,
       },
     };
-    setTimetable(newTimetable);
+    setTimetable(newTimetable); // Update timetable with holdiay
   };
-
 
   useEffect(() => {
     fetchUserInfo();
@@ -58,20 +58,21 @@ const Edit = () => {
   useEffect(() => {
     const fetchTimetables = async () => {
       try {
-        const response = await axios.get("http://localhost:4000/timetables");
+        const response = await axios.get("http://localhost:4000/timetables");// Get current timetables from server
         setTimetables(response.data);
       } catch (error) {
         console.error("Error fetching timetables", error);
       }
     };
-
     fetchTimetables();
   }, []);
 
   const handleChange = (e) => {
+    // Extract the name and value properties from the event target
     const { name, value } = e.target;
     const day = name.split(".")[0];
     const field = name.split(".")[1];
+    // When timetable is changed then change the values to that timetable
     const newTimetable = {
       ...timetable,
       [day]: {
@@ -83,21 +84,29 @@ const Edit = () => {
     setTimetable(newTimetable);
   };
 
+  // Calculates hours difference between each day
   const calculateTotalHours = (day, startTime, endTime, hasDayOff) => {
+    // If the days is marked off then 0 hours are worked
     if (hasDayOff) return 0;
+    // If the start time or end time is missing, 0 hours are worked
     if (!startTime || !endTime) return 0;
     const start = new Date(`2001-01-01T${startTime}:00`);
     const end = new Date(`2001-01-01T${endTime}:00`);
+    // Calculate the difference between start and end times
     const diff = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
+    // If  the difference is positive then return it otherwise add 24 h and then return
     return diff > 0 ? diff : diff + 24;
   };
 
+//Handles changing the selected timetable
   const handleSelectTimetable = (e) => {
+    // Get the selected timetable's ID
     const selectedId = e.target.value;
     if (selectedId) {
       const selected = timetables.find((t) => t._id === selectedId);
       setSelectedTimetable(selected);
 
+      // Create a new timetable when the selected timetable changes
       const newTimetable = {};
       selected.schedule.forEach(([day, startTime, endTime]) => {
         newTimetable[day] = {
@@ -110,8 +119,10 @@ const Edit = () => {
           ),
         };
       });
+      // Update the timetable with new timetable 
       setTimetable(newTimetable);
     } else {
+      // Default values when no timetable is selected
       setSelectedTimetable(null);
       setTimetable({
         Sunday: { startTime: "", endTime: "", totalHours: 0 },
@@ -127,24 +138,30 @@ const Edit = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const schedule = Object.entries(timetable).map(([day, { startTime, endTime, totalHours }]) => [
-      day,
-      `2001-01-01T${startTime}:00`,
-      `2001-01-01T${endTime}:00`,
-      totalHours
-    ]);
+    // Create a new schedule array from the timetable state
+    const schedule = Object.entries(timetable).map(
+      ([day, { startTime, endTime, totalHours }]) => [
+        day,
+        `2001-01-01T${startTime}:00`,
+        `2001-01-01T${endTime}:00`,
+        totalHours,
+      ]
+    );
+    
     if (selectedTimetable) {
       try {
-        await axios.put(`http://localhost:4000/timetables/${selectedTimetable._id}`, {
-          schedule,
-        });
-        alert('Timetable updated successfully');
+        await axios.put(
+          `http://localhost:4000/timetables/${selectedTimetable._id}`, //Send new timetable to DB
+          {
+            schedule,
+          }
+        );
+        alert("Timetable updated successfully");
       } catch (error) {
-        console.error('Error updating timetable', error);
+        console.error("Error updating timetable", error);
       }
     }
   };
-  
 
   return (
     <>
@@ -280,7 +297,7 @@ const Edit = () => {
               Holiday
             </button>
           </div>
-          
+
           <div>
             <label htmlFor="Friday.startTime">Friday start time:</label>
             <input
@@ -328,25 +345,26 @@ const Edit = () => {
           <button type="submit">Submit</button>
         </form>
         <table>
-  <thead>
-    <tr>
-      <th>User ID</th>
-      <th>First Name</th>
-      <th>Last Name</th>
-      <th>User Type</th>
-    </tr>
-  </thead>
-  <tbody>
-    {userInfo.map((user) => (
-      <tr key={user.userID}>
-        <td>{user.userID}</td>
-        <td>{user.firstName}</td>
-        <td>{user.lastName}</td>
-        <td>{user.userType}</td>
-      </tr>
-    ))}
-  </tbody>
-</table>
+          <thead>
+            <tr>
+              <th>User ID</th>
+              <th>First Name</th>
+              <th>Last Name</th>
+              <th>User Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            {/*Print the user info at the bottom*/}
+            {userInfo.map((user) => (
+              <tr key={user.userID}>
+                <td>{user.userID}</td>
+                <td>{user.firstName}</td>
+                <td>{user.lastName}</td>
+                <td>{user.userType}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </>
   );

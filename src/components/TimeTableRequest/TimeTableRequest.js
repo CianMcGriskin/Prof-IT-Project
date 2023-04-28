@@ -4,30 +4,59 @@ import { useNavigate } from "react-router-dom";
 import NavigationBar from "../Navbar/Navbar";
 
 const RequestTimeTableModification = () => {
-  const [timetables, setTimetables] = useState([]);
-  const [selectedTimetable, setSelectedTimetable] = useState(null);
-  const [selectedDays, setSelectedDays] = useState([]);
-  const [totalHours, setTotalHours] = useState({});
+  // Define state variables
+  const [timetables, setTimetables] = useState([]); // list of user's timetables
+  const [selectedTimetable, setSelectedTimetable] = useState(null); // selected timetable
+  const [selectedDays, setSelectedDays] = useState([]); // list of selected days
+  const [totalHours, setTotalHours] = useState({}); // total number of hours worked for each modified day
+  const [userID, setUserID] = useState(null); // user ID
 
   const navigate = useNavigate();
 
+  // fetch the user ID
   useEffect(() => {
-    const fetchTimetables = async () => {
+    const fetchUserID = async () => {
       try {
-        const response = await axios.get("http://localhost:4000/timetables");
-        console.log(response.data);
-        setTimetables(response.data);
+        const response = await axios.get("http://localhost:4000/api/userid", {
+          withCredentials: true,
+        });
+        setUserID(response.data); // update the userID  with the userID from the server
+        // console.log(response.data);
       } catch (error) {
-        console.error("Error fetching timetables", error);
+        console.error("Error fetching user ID", error);
       }
     };
 
-    fetchTimetables();
+    fetchUserID();
   }, []);
 
+  // fetch the user's timetables with their userID 
+  useEffect(() => {
+    if (userID) {
+      const fetchTimetables = async () => {
+        try {
+          const response = await axios.get("http://localhost:4000/timetables", {
+            withCredentials: true,
+          });
+          // filter the list of timetables to include only the timetables that are tied to the current user
+          const userTimetables = response.data.filter(
+            (tt) => tt.userID === userID
+          );
+          console.log(userTimetables);
+          setTimetables(userTimetables); // update the timetables with the user's timetables
+        } catch (error) {
+          console.error("Error fetching timetables", error);
+        }
+      };
+
+      fetchTimetables();
+    }
+  }, [userID]);
+
+  // Timetable dropdown
   const handleSelectTimetable = (e) => {
     const timetableId = e.target.value;
-    const timetable = timetables.find((tt) => tt.weekID === timetableId);
+    const timetable = timetables.find((tt) => tt.weekID === timetableId); //Filtered by the user id
     setSelectedTimetable(timetable);
   };
 
@@ -36,9 +65,9 @@ const RequestTimeTableModification = () => {
     const isSelected = e.target.checked;
 
     if (isSelected) {
-      setSelectedDays([...selectedDays, day]);
+      setSelectedDays([...selectedDays, day]); // add the selected day to the list of selected days
     } else {
-      setSelectedDays(selectedDays.filter((d) => d !== day));
+      setSelectedDays(selectedDays.filter((d) => d !== day)); // remove the selected day from the list of selected days
     }
   };
 
@@ -57,9 +86,9 @@ const RequestTimeTableModification = () => {
         const hours = diffInMs / 1000 / 60 / 60;
         setTotalHours({
           ...totalHours,
-          [dayName]: hours.toFixed(2),
+          [dayName]: hours.toFixed(2), // update the totalHours with total number of hours worked for the modified day
         });
-        return [day[0], startTime || day[1], endTime || day[2], day[3]];
+        return [day[0], startTime || day[1], endTime || day[2], day[3]]; // construct a new day object with the modified start and/or end time
       }
       return day;
     });
@@ -69,12 +98,12 @@ const RequestTimeTableModification = () => {
       schedule: updatedDay,
     });
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     try {
-      const modifiedDays = selectedTimetable.schedule.map(day => {
+      // Create the modified timetable
+      const modifiedDays = selectedTimetable.schedule.map((day) => {
         if (selectedDays.includes(day[0])) {
           // Calculate total hours worked for modified days
           const start = new Date(day[1]);
@@ -86,24 +115,26 @@ const RequestTimeTableModification = () => {
           return day;
         }
       });
-  
+
       const modifiedHoursData = {
         schedule: modifiedDays,
         userID: selectedTimetable.userID,
         weekID: selectedTimetable.weekID,
       };
-  
-      console.log(modifiedHoursData);
-  
-      await axios.post("http://localhost:4000/modify-hours", modifiedHoursData);
-      // Show success message or perform additional actions on successful save
+
+      //console.log(modifiedHoursData);
+
+      await axios.post(
+        "http://localhost:4000/modify-hours",
+        modifiedHoursData,
+        {
+          withCredentials: true, //Post new timetable to DB
+        }
+      );
     } catch (error) {
       console.error("Error saving modified hours", error);
-      // Show error message or perform additional actions on error
     }
   };
-  
-  
 
   return (
     <>
@@ -119,7 +150,7 @@ const RequestTimeTableModification = () => {
             </option>
           ))}
         </select>
-  
+
         {selectedTimetable && (
           <>
             <h2>Select days for modification:</h2>
@@ -137,7 +168,7 @@ const RequestTimeTableModification = () => {
             ))}
           </>
         )}
-  
+
         {selectedDays.length > 0 && (
           <>
             <h2>Modify the selected days:</h2>
@@ -166,6 +197,7 @@ const RequestTimeTableModification = () => {
                       onChange={handleChange}
                     />
                   </label>
+
                   {totalHours[dayName] && (
                     <p>Total hours worked: {totalHours[dayName]}</p>
                   )}
@@ -174,12 +206,11 @@ const RequestTimeTableModification = () => {
             })}
           </>
         )}
-  
+
         <button type="submit">Submit Request</button>
       </form>
     </>
   );
-  
 };
 
 export default RequestTimeTableModification;

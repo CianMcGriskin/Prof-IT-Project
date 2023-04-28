@@ -1,90 +1,22 @@
-/*
-*/
-/*
-* {
-    box-sizing: border-box;
-    font-family: Arial, sans-serif;
-    font-size: 16px;
-  }
-  
-  body {
-    margin: 0;
-    padding: 0;
-  }
-  
-  /* Style the NavigationBar component
-  .NavigationBar {
-    background-color: #333;
-    color: #fff;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-  }
-  
-  .NavigationBar h1 {
-    margin: 0;
-  }
-  
-  /* Style the form
-  form {
-    margin: 20px;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background-color: #f7f7f7;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  form label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-  }
-  
-  form select {
-    width: 200px;
-    padding: 5px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    margin-bottom: 10px;
-  }
-  
-  form button {
-    padding: 10px;
-    background-color: #333;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  form button:hover {
-    background-color: #444;
-  }
-  
-  /* Style the table
-  table {
+  #TableDisplay {
     margin: 20px;
     border-collapse: collapse;
     width: 100%;
   }
   
-  table th,
-  table td {
+  #TableDisplay th,
+  #TableDisplay td {
     border: 1px solid #ddd;
     padding: 10px;
     text-align: left;
   }
-  
-  table th {
+
+  #TableDisplay th{
     background-color: #f2f2f2;
   }
 
-  /*button {
+  #CopyTimetableButton {
+    margin-top: 10px;
     padding: 10px;
     background-color: #4CAF50;
     color: #fff;
@@ -94,6 +26,42 @@
     transition: background-color 0.3s ease;
   }
   
-  button:hover {
+  #CopyTimetableButton:hover {
     background-color: #3e8e41;
-  }*/
+  }
+
+  /* Style the select element */
+  .selectBox {
+    appearance: none;
+    background-color: #fff;
+    border: none;
+    border-radius: 4px;
+    color: #333;
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+    width: 100%;
+    max-width: 400px;
+  }
+
+  /* Style the select element when it's in focus */
+  .selectBox:focus {
+    border-color: #0077ff;
+    box-shadow: 0 0 0 2px rgba(0, 119, 255, 0.3);
+    outline: none;
+  }
+
+  /* Style the select element's options */
+  .selectBox option {
+    color: #333;
+    font-size: 1rem;
+  }
+
+  /* Style the select element's dropdown arrow */
+  .selectBox::-ms-expand {
+    display: none;
+  }
+
+  .labelDisplay{
+    text-align: center;
+    font-weight: bold;
+  }

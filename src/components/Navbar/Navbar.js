@@ -29,7 +29,7 @@ function NavigationBar(){
     <>
       <Navbar bg="dark" variant="dark">
         <Container>
-          <Navbar.Brand>Grosterota</Navbar.Brand>
+          <Navbar.Brand>Rosterota</Navbar.Brand>
           <Nav className="me-auto">
             {!isManager && <Nav.Link href="/timetable">Timetable</Nav.Link>}
             {isManager && <Nav.Link href="/timetable-manager">Timetable</Nav.Link>}
@@ -38,10 +38,17 @@ function NavigationBar(){
                 <NavDropdown.Item href="/CreateTimeTable">Create Timetable</NavDropdown.Item>
                 <NavDropdown.Item href="/edit">Edit Timetable</NavDropdown.Item> {/* add a new NavDropdown item */}
               </NavDropdown>
-              
             )}
+                        {isManager && (
+              <NavDropdown title="Timetable Requests" id="timetable-dropdown">
+                <NavDropdown.Item href="/TimeTableRequest">Timetable Requests</NavDropdown.Item>
+                <NavDropdown.Item href="/approve">Approve timetable request</NavDropdown.Item> {/* add a new NavDropdown item */}
+              </NavDropdown>
+            )}
+            
             {isManager && <Nav.Link href="/RegisterReq">Register Requests</Nav.Link>}
-            {isManager && <Nav.Link href="/TimeTableRequest">Timetable Requests</Nav.Link>}
+            {/*<Nav.Link href="/TimeTableRequest">Timetable Requests</Nav.Link>*/}
+
             <Nav.Link as={LogoutComponent}>Logout</Nav.Link>
           </Nav>
         </Container>
