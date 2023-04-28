@@ -88,8 +88,10 @@ app.post("/", async (req, res) => {
     console.log("Email Not Found in / post request");
     else {
       // Check if password matches
-      if (user.password === password /* && user.status === "Accepted" */)
+      if (user.password === password /* && user.status === "Accepted" */){
         res.cookie("UserAuth", "AuthTest", { httpOnly: false });
+        res.status(200).send("success");
+      }
       else if (user.password === password && user.status != "Accepted") 
         console.log("User not accepted in / post request");
       else 
@@ -283,10 +285,10 @@ app.get('/api/userinfo', async (req, res) => {
   }
 });
 
+
 app.patch('/api/registerRequests/:id', async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
-
   try {
     // Update Register Request
     const updatedRequest = await RegisterRequests.findByIdAndUpdate(
