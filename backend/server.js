@@ -413,6 +413,25 @@ app.post('/api/copy-timetable', async (req, res) => {
   res.sendStatus(200);
 });
 
+//Section used for handling deletion of a user
+// Delete user by id from UserInfo, Users, and RegisterRequests collections
+app.delete('/api/user/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    // Delete from UserInfo collection
+    await UserInfo.deleteOne({ userID: id });
+    // Delete from Users collection
+    await Users.deleteOne({ userID: id });
+    // Delete from RegisterRequests collection
+    await RegisterRequests.deleteOne({ UserID: id });
+    res.sendStatus(200);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
+  }
+});
+
+
 // Start the server
 let port = 4000;
 app.listen(port, () => {

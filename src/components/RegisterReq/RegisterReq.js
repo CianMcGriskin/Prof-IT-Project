@@ -15,11 +15,13 @@ const RegisterReq = () => {
     };
     fetchData();
   }, []);
+
   //On approving change the status to 'Approved' allowing the user to log in 
   const handleApprove = async (id, userID) => {
     const response = await axios.patch(`http://localhost:4000/api/registerRequests/${id}`, {
       status: 'Approved'
     });
+
     // 200 is a succesfull request
     if (response.status === 200) {
       //console.log("User ID:", userID);  
@@ -37,6 +39,16 @@ const RegisterReq = () => {
       setRegisterRequests(updatedRequests);
     }
   };
+
+
+  const handleDelete = async (id, userID) => {
+    // Delete user
+    const userDelete = await axios.delete(`http://localhost:4000/api/user/${userID}`);
+      if (userDelete.status === 200) {
+        // Remove request from state
+        const updatedRequests = registerRequests.filter(req => req._id !== id);
+        setRegisterRequests(updatedRequests);
+      }};
   
   
 
@@ -62,7 +74,10 @@ const RegisterReq = () => {
                 <td>{req.hourlyRate}</td>
                 <td>
                   {req.status === 'Pending' && (
+                    <>
                     <button onClick={() => handleApprove(req._id, req.UserID)}>Approve</button>
+                    {<button onClick={() => handleDelete(req._id, req.UserID)}>Delete</button>}
+                    </>
                   )}
                 </td>
               </tr>
