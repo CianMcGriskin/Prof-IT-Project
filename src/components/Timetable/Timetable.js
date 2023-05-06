@@ -57,35 +57,44 @@ const TimetablePage = () => {
         <button className="arrow" onClick={() => handleClick('right')}>&#62;</button>
       </div>
 
-      {weeks[selectedWeekIndex-1] && (  
-        <div>
-            {filteredData.map((schedule, index) => (
-              <div key={index}>
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Day</th>
-                      <th>Start Time</th>
-                      <th>End Time</th>
-                      <th>Hours Worked</th> 
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {schedule.schedule.map((data, index) => (
-                      <tr key={index}>
-                        <td>{data[0]}</td>
-                        <td>{new Date(data[1]).toLocaleTimeString()}</td>
-                        <td>{new Date(data[2]).toLocaleTimeString()}</td>
-                        <td>{data[3].toFixed(2)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            
+      {weeks[selectedWeekIndex-1] && (
+  <div>
+    {filteredData.map((schedule, index) => (
+      <div key={index}>
+        <table>
+          <thead>
+            <tr>
+              <th>Day</th>
+              <th>Start Time</th>
+              <th>End Time</th>
+              <th>Hours Worked</th> 
+            </tr>
+          </thead>
+          <tbody>
+          {schedule.schedule.map((data, index) => (
+            <tr key={index}>
+              <td>{data[0]}</td>
+              {new Date(data[1]).toLocaleTimeString() === "12:00:00 AM" && new Date(data[2]).toLocaleTimeString() === "12:00:00 AM" ? (
+                <>
+                  <td>Day Off</td>
+                  <td>Day Off</td>
+                  <td>0</td>
+                </>
+              ) : (
+                <>
+                  <td>{new Date(data[1]).toLocaleTimeString()}</td>
+                  <td>{new Date(data[2]).toLocaleTimeString()}</td>
+                  <td>{data[3].toFixed(2)}</td>
+                </>
+              )}
+            </tr>
           ))}
-        </div>
-      )}
+          </tbody>
+        </table>
+      </div>
+    ))}
+  </div>
+)}
     </div>
   );
 };

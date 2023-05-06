@@ -131,12 +131,12 @@ const AdminApproval = () => {
         return (
           <div>
           <div key={index}>
-            
             {modifiedTimetable.userInfo && (
               <h3>
-                Requester: {modifiedTimetable.userInfo.firstName} {modifiedTimetable.userInfo.lastName} Id:{modifiedTimetable.userInfo.userID} 
+                Requester: {modifiedTimetable.userInfo.firstName} {modifiedTimetable.userInfo.lastName}
               </h3>
             )}
+            <h4>Week ID: {modifiedTimetable.weekID}</h4>
             <table>
               <thead>
                 <tr>

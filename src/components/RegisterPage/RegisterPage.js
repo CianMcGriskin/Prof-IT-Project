@@ -11,13 +11,14 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [companyID, setCompanyID] = useState("");
+  const [error, setError] = useState("");
 
   const handleSubmit = async (event) => {
     event.preventDefault();
   
     // Validate the entered information
     if (password !== confirmPassword) {
-      alert("Passwords do not match");
+      setError("Passwords do not match");
       return;
     }
   
@@ -36,7 +37,12 @@ const Register = () => {
       window.location.href = "/";
     } catch (error) {
       console.error("Error registering user:", error);
-      alert("Error registering user. Please try again.");
+
+      // Display error message using HTML and CSS
+      const errorMessage = document.createElement("div");
+      errorMessage.className = "error-message";
+      errorMessage.textContent = "Error registering user. Please try again.";
+      document.body.appendChild(errorMessage);
     }
   };
   
@@ -124,6 +130,7 @@ const Register = () => {
         </div>
 
         <button type="submit">Sign Up</button>
+        {error && <div className="error">{error}</div>}
       </form>
     </div>
   );
