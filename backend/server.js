@@ -91,11 +91,11 @@ app.post("/", async (req, res) => {
       res.status(401).send("Invalid email or password");
     }
     else {
-      if (user.password === password && user.status === "Accepted"){
+      if (user.password === password && user.status === "Approved"){
         res.cookie("UserAuth", "AuthTest", { httpOnly: false });
         res.status(200).send("success");
       } 
-      else if (user.password === password && user.status !== "Accepted") {
+      else if (user.password === password && user.status !== "Approved") {
         console.log("User not accepted in / post request");
         res.status(401).send("User not accepted yet");
       }
