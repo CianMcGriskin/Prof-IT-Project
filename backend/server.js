@@ -102,15 +102,27 @@ app.post("/", async (req, res) => {
 
 // Request to retrieve timetable information
 app.get("/timetable", async (req, res) => {
+  const email = req.cookies.Auth;
+  let userID;
+  if (!email) {
+    console.log("Email cookie is undefined");
+    return;
+  }
+
   try {
+    // Find userID based on email from cookie
+    const user = await Users.findOne({ email: email });
+    userID = user.userID;
+    console.log(userID);
     // Fetch data from "Hours" collection
-    const hours = await Hours.find();
+    const hours = await Hours.find({ userID: userID });
     // Return data as JSON response
     res.json(hours);
   } catch (err) {
     console.log(err);
   }
 });
+
 
 // Request to retrieve timetable information from a particular timetable weekID
 app.get("/timetable/:weekId", async (req, res) => {

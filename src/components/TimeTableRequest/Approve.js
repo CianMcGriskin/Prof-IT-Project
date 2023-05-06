@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import NavigationBar from '../Navbar/Navbar';
 import axios from "axios";
-import NavigationBar from "../Navbar/Navbar";
-
 
 const AdminApproval = () => {
   const [requests, setRequests] = useState([]); // array of timetable change requests

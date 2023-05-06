@@ -15,7 +15,7 @@ const TimetablePage = () => {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:4000/timetable`)
+      .get(`http://localhost:4000/timetable`, {withCredentials: true})
       .then((response) => {
         setScheduleData(response.data);
       })
