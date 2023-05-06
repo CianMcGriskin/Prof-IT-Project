@@ -82,22 +82,30 @@ app.post("/", async (req, res) => {
   const { email, password } = req.body;
   // Check if email exists in the database using the inputed data from the user
   Users.findOne({ email }, (err, user) => {
-    if (err) 
+    if (err) {
       console.log("Server Error Occured in / post request");
-    else if (!user) 
-    console.log("Email Not Found in / post request");
+      res.status(500).send("Internal server error");
+    }
+    else if (!user) {
+      console.log("Email Not Found in / post request");
+      res.status(401).send("Invalid email or password");
+    }
     else {
-      // Check if password matches
-      if (user.password === password /* && user.status === "Accepted" */){
+      if (user.password === password && user.status === "Accepted"){
         res.cookie("UserAuth", "AuthTest", { httpOnly: false });
         res.status(200).send("success");
       } 
-      else if (user.password === password && user.status != "Accepted") 
+      else if (user.password === password && user.status !== "Accepted") {
         console.log("User not accepted in / post request");
-      else 
-        console.log("Wrong password in / post request"); 
+        res.status(401).send("User not accepted yet");
+      }
+      else {
+        console.log("Wrong password in / post request");
+        res.status(401).send("Invalid email or password");
+      }
     }
   });
+  
 });
 
 // Request to retrieve timetable information

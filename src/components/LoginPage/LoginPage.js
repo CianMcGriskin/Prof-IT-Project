@@ -7,7 +7,8 @@ import Cookies from 'js-cookie';
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  
+  const [error, setError] = useState(null);
+
   // Check for the Auth cookie
   const hasAuthCookie = Cookies.get('Auth');
   if (hasAuthCookie) 
@@ -19,6 +20,7 @@ const LoginPage = () => {
     axios
       .post("http://localhost:4000/", { email, password })
       .then((response) => {
+        console.log(response);
         if(response.data === "success"){
           // Set expiry date for the cookie
           var expiryDate = new Date();
@@ -26,12 +28,13 @@ const LoginPage = () => {
 
           // Set the cookie with the expiry date
           document.cookie = "Auth=" + email +"; expires=" + expiryDate.toUTCString() + "; path=/";
+
+          // Navigate to apps homepage
+          window.location.href = "/timetable";
         }
-        // Navigate to apps homepage
-        window.location.href = "/timetable";
       })
       .catch((error) => {
-        console.error(error.data); // Show an error message to the user
+        setError("Invalid credentials. Please try again.");
       });
   };
 
@@ -67,7 +70,7 @@ const LoginPage = () => {
         <button type="submit" className="login-submit-button">
           Login
         </button>
-
+        {error && <div className="error">{error}</div>}
       </form>
     </div>
   );
