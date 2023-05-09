@@ -305,6 +305,15 @@ app.get('/api/userinfo', async (req, res) => {
   }
 });
 
+app.get('/api/users', async (req, res) => {
+  try {
+    const userInfo = await Users.find({}, { _id: 0, __v: 0 });
+    res.json(userInfo);
+  } catch (error) {
+    console.error(error);
+  }
+});
+
 
 app.patch('/api/registerRequests/:id', async (req, res) => {
   const { id } = req.params;

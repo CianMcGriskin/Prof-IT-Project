@@ -60,16 +60,25 @@ const CreateTimeTable = () => {
   };
 
   const [userInfo, setUserInfo] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [userStatus, setUser] = useState([]);
 
   const fetchUserInfo = async () => {
     try {
       const response = await axios.get("http://localhost:4000/api/userinfo"); //Fetch user info
       setUserInfo(response.data);
+      
+      const userResponse = await axios.get("http://localhost:4000/api/users"); //Fetch user info
+      setUser(userResponse.data);
+      console.log(userResponse.data)
     } catch (error) {
       console.error(error);
     }
   };
 
+  const filteredUsers = users.filter(user => user.status !== 'Pending');
+
+  console.log(filteredUsers);
 
   useEffect(() => {
     fetchUserInfo();
@@ -195,14 +204,16 @@ const CreateTimeTable = () => {
             </tr>
           </thead>
           <tbody>
-            {userInfo.map((user) => (
-              <tr key={user.userID}>
-                <td>{user.userID}</td>
-                <td>{user.firstName}</td>
-                <td>{user.lastName}</td>
-                <td>{user.userType}</td>
-              </tr>
-            ))}
+          {userInfo.filter(user => user.status !== "Pending").map(user => (
+  <tr key={user.userID}>
+    <td>{user.userID}</td>
+    <td>{user.firstName}</td>
+    <td>{user.lastName}</td>
+    <td>{user.userType.charAt(0).toUpperCase() + user.userType.slice(1)}</td>
+  </tr>
+))}
+
+
           </tbody>
         </table>
 
